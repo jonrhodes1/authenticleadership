@@ -1,0 +1,3377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>From Psychological Safety to Authentic Leadership</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body, #root {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #0A0F1C;
+    font-family: 'DM Sans', sans-serif;
+    color: #FFFFFF;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  @keyframes wordReveal {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 0.8; }
+  }
+
+  @keyframes drawLine {
+    from { stroke-dashoffset: 1000; }
+    to   { stroke-dashoffset: 0; }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes nodeAppear {
+    from { opacity: 0; transform: scale(0.4); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes slideInRight {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+  }
+
+  input[type="number"], input[type="text"] {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(0,240,208,0.4);
+    border-radius: 8px;
+    color: #ffffff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 6px 10px;
+    outline: none;
+  }
+  input[type="number"]:focus, input[type="text"]:focus {
+    border-color: #00F0D0;
+    box-shadow: 0 0 0 2px rgba(0,240,208,0.15);
+  }
+  input[type="number"] { width: 64px; }
+  input[type="text"]   { width: 80px; }
+
+  select {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(0,240,208,0.3);
+    border-radius: 8px;
+    color: #ffffff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 5px 8px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,240,208,0.3); border-radius: 2px; }
+
+  @media (max-width: 768px) {
+    .three-cards { flex-direction: column !important; }
+    .two-cards   { flex-direction: column !important; }
+    .team-layout { flex-direction: column !important; }
+    .quadrant-grid { grid-template-columns: 1fr 1fr !important; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* --- DESIGN TOKENS ------------------------------------------- */
+const C = {
+  bg: '#0A0F1C',
+  cream: '#FAF3E8',
+  teal: '#00F0D0',
+  coral: '#E07A5F',
+  white: '#FFFFFF',
+  grey: '#9CA3AF',
+  darkText: '#1A1A2E',
+};
+
+const glass = {
+  background: 'rgba(255,255,255,0.05)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: '16px',
+  padding: '2rem',
+};
+
+const label = {
+  fontFamily: "'DM Sans', sans-serif",
+  fontSize: '11px',
+  fontWeight: '500',
+  letterSpacing: '0.15em',
+  textTransform: 'uppercase',
+  color: C.teal,
+};
+
+const bgNumeral = (num) => ({
+  position: 'absolute',
+  right: '-20px',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  fontFamily: "'Instrument Serif', serif",
+  fontSize: '220px',
+  fontWeight: '700',
+  color: 'rgba(255,255,255,0.06)',
+  lineHeight: 1,
+  userSelect: 'none',
+  pointerEvents: 'none',
+  zIndex: 0,
+});
+
+/* --- RESEARCH CARDS DATA ------------------------------------- */
+const researchCards = [
+  {
+    name: "Amy C. Edmondson",
+    role: "Novartis Professor of Leadership and Management, Harvard Business School. Ranked #1 on Thinkers50 (2021, 2023).",
+    concept: "Psychological Safety: the shared belief held by members of a team that the team is safe for interpersonal risk-taking. Edmondson's 1999 study across 51 work teams found that psychological safety predicted learning behaviour, which in turn predicted team performance. Her framework shapes the quadrant exercise, the five leader behaviours, and the session's core argument that speaking up is a leadership problem, not a personality one.",
+    works: [
+      "Edmondson, A. C. (1999). Psychological Safety and Learning Behavior in Work Teams. <em>Administrative Science Quarterly</em>, 44(2), 350-383.",
+      "Edmondson, A. C. (2018). <em>The Fearless Organization</em>. Wiley.",
+      "Edmondson, A. C. (2023). <em>Right Kind of Wrong: The Science of Failing Well</em>. Atria Books.",
+      "Edmondson, A. C. & Bransby, D. P. (2023). Psychological Safety Comes of Age. <em>Annual Review of Organizational Psychology and Organizational Behavior</em>, 10.",
+    ],
+    links: [
+      { label: "Amy Edmondson, Harvard Business School", url: "https://www.hbs.edu/faculty/Pages/profile.aspx?facId=6451" },
+      { label: "amycedmondson.com", url: "https://amycedmondson.com/psychological-safety/" },
+      { label: "What Is Psychological Safety? (HBR)", url: "https://hbr.org/2023/02/what-is-psychological-safety" },
+    ],
+  },
+  {
+    name: "Alex 'Sandy' Pentland",
+    role: "Director, MIT Human Dynamics Laboratory and MIT Media Lab Entrepreneurship Program.",
+    concept: "Energy, Engagement, Exploration: using electronic sociometric badges to measure communication patterns across teams, Pentland's research showed that how teams communicate (not what they discuss) is the strongest predictor of performance. Energy measures total contribution volume, Engagement measures the density of intra-team connections, and Exploration measures cross-team information-seeking. This framework shapes the team mapping activity and the interactive sociogram tool in this workshop.",
+    works: [
+      "Pentland, A. (2012). The New Science of Building Great Teams. <em>Harvard Business Review</em>, April 2012.",
+      "Pentland, A. (2008). <em>Honest Signals: How They Shape Our World</em>. MIT Press.",
+      "Pentland, A. (2014). <em>Social Physics: How Social Networks Can Make Us Smarter</em>. Penguin Press.",
+    ],
+    links: [
+      { label: "Alex Pentland, MIT Media Lab", url: "https://www.media.mit.edu/people/sandy/overview/" },
+      { label: "The New Science of Building Great Teams (HBR)", url: "https://hbr.org/2012/04/the-new-science-of-building-great-teams" },
+    ],
+  },
+  {
+    name: "Roger C. Mayer, James H. Davis & F. David Schoorman",
+    role: "Organisational trust researchers. Mayer and Davis at Baylor University; Schoorman at Purdue University.",
+    concept: "The Integrative Model of Organizational Trust defines trust as the willingness to be vulnerable to the actions of another party. The model identifies three dimensions of perceived trustworthiness: Ability (competence), Benevolence (genuine concern), and Integrity (adherence to acceptable principles). This framework shapes the trust section of the workshop.",
+    works: [
+      "Mayer, R. C., Davis, J. H., & Schoorman, F. D. (1995). An Integrative Model of Organizational Trust. <em>Academy of Management Review</em>, 20(3), 709-734.",
+      "Schoorman, F. D., Mayer, R. C., & Davis, J. H. (2007). An Integrative Model of Organizational Trust: Past, Present, and Future. <em>Academy of Management Review</em>, 32(2), 344-354.",
+    ],
+    links: [
+      { label: "An Integrative Model of Organizational Trust (JSTOR)", url: "https://www.jstor.org/stable/258792" },
+    ],
+  },
+  {
+    name: "Daniel J. McAllister",
+    role: "Professor, National University of Singapore Business School.",
+    concept: "Cognitive and Affective Trust: the landmark 1995 study established these as two distinct but related dimensions of interpersonal trust. Cognitive trust develops through rational assessment of reliability and competence. Affective trust develops through emotional bonds and mutual care. A key finding: cognitive trust typically precedes and enables affective trust. A baseline rational confidence comes before deeper emotional trust can develop.",
+    works: [
+      "McAllister, D. J. (1995). Affect- and Cognition-Based Trust as Foundations for Interpersonal Cooperation in Organizations. <em>Academy of Management Journal</em>, 38(1), 24-59.",
+    ],
+    links: [
+      { label: "McAllister (1995), Academy of Management Journal", url: "https://journals.aom.org/doi/10.5465/256727" },
+    ],
+  },
+  {
+    name: "Nicole Gillespie & Graham Dietz",
+    role: "Gillespie at University of Queensland Business School; Dietz formerly at Durham University Business School.",
+    concept: "Organisational Trust Repair: a four-stage model for restoring trust after an organisational failure: immediate response, diagnosis, reforming interventions, and evaluation. Their framework shows that trust repair is a sustained process requiring alignment across leadership, culture, structures, and strategy.",
+    works: [
+      "Gillespie, N. & Dietz, G. (2009). Trust Repair After an Organization-Level Failure. <em>Academy of Management Review</em>, 34(1), 127-145.",
+    ],
+    links: [
+      { label: "Trust Repair After Organization-Level Failure (AoM)", url: "https://journals.aom.org/doi/10.5465/amr.2009.35713319" },
+    ],
+  },
+  {
+    name: "Daan van Knippenberg, Carsten K. W. De Dreu & Astrid C. Homan",
+    role: "Organisational behaviour researchers. Van Knippenberg at Drexel University.",
+    concept: "The Categorization-Elaboration Model shows that what matters in diverse teams is not communication volume but depth of information processing. Teams must actually integrate and build on each other's knowledge, not simply exchange it. This shapes the quality-versus-frequency discussion in the workshop.",
+    works: [
+      "Van Knippenberg, D., De Dreu, C. K. W., & Homan, A. C. (2004). Work Group Diversity and Group Performance: An Integrative Model and Research Agenda. <em>Journal of Applied Psychology</em>, 89(6), 1008-1022.",
+    ],
+    links: [
+      { label: "Work Group Diversity and Group Performance (APA PsycNet)", url: "https://psycnet.apa.org/doi/10.1037/0021-9010.89.6.1008" },
+    ],
+  },
+  {
+    name: "Bruce J. Avolio & William L. Gardner",
+    role: "Avolio at University of Washington Foster School of Business; Gardner at Texas Tech University.",
+    concept: "Authentic Leadership rests on four pillars: self-awareness, relational transparency, internalised moral perspective, and balanced processing. The workshop's closing messages ('Be yourself, without being a problem') apply this framework directly: authenticity without moral perspective is self-expression, not leadership.",
+    works: [
+      "Avolio, B. J. & Gardner, W. L. (2005). Authentic Leadership Development: Getting to the Root of Positive Forms of Leadership. <em>The Leadership Quarterly</em>, 16(3), 315-338.",
+      "Walumbwa, F. O., Avolio, B. J., Gardner, W. L., Wernsing, T. S., & Peterson, S. J. (2008). Authentic Leadership: Development and Validation of a Theory-Based Measure. <em>Journal of Management</em>, 34(1), 89-126.",
+    ],
+    links: [
+      { label: "Authentic Leadership Development (ScienceDirect)", url: "https://www.sciencedirect.com/science/article/pii/S1048984305000263" },
+    ],
+  },
+  {
+    name: "Google's Project Aristotle",
+    role: "Internal research project at Google (2012-2016), led by Julia Rozovsky.",
+    concept: "After studying hundreds of Google teams, the project found that who was on a team mattered less than how they worked together. Psychological safety was the single most important factor, followed by dependability, structure and clarity, meaning, and impact.",
+    works: [
+      "Duhigg, C. (2016). What Google Learned From Its Quest to Build the Perfect Team. <em>The New York Times Magazine</em>, 25 February 2016.",
+    ],
+    links: [
+      { label: "What Google Learned (New York Times)", url: "https://www.nytimes.com/2016/02/28/magazine/what-google-learned-from-its-quest-to-build-the-perfect-team.html" },
+    ],
+  },
+  {
+    name: "Gretchen Spreitzer, Christine Porath & Colleagues",
+    role: "Spreitzer is Professor of Management and Organizations, University of Michigan Ross School of Business. Porath is Professor of Management, Georgetown University.",
+    concept: "Thriving at Work: defined as the joint psychological experience of vitality (feeling energised and alive) and learning (a sense of continuous growth). The Socially Embedded Model of Thriving identifies three contextual enabling conditions: a climate of trust and respect, broad information sharing (openness), and decision-making discretion (understanding). A comprehensive meta-analysis confirmed thriving is associated with better health, higher performance, stronger commitment, lower burnout, and more innovation.",
+    works: [
+      "Spreitzer, G., Sutcliffe, K., Dutton, J., Sonenshein, S., & Grant, A. M. (2005). A Socially Embedded Model of Thriving at Work. <em>Organization Science</em>, 16(5), 537-549.",
+      "Porath, C., Spreitzer, G., Gibson, C., & Garnett, F. G. (2012). Thriving at Work: Toward Its Measurement, Construct Validation, and Theoretical Refinement. <em>Journal of Organizational Behavior</em>, 33(2), 250-275.",
+      "Kleine, A.-K., Rudolph, C. W., & Zacher, H. (2019). Thriving at Work: A Meta-Analysis. <em>Journal of Organizational Behavior</em>, 40(9-10), 973-999.",
+      "Carmeli, A. & Spreitzer, G. (2009). Trust, Connectivity, and Thriving: Implications for Innovative Behaviors at Work. <em>Journal of Creative Behavior</em>, 43(3), 169-191.",
+    ],
+    links: [
+      { label: "Gretchen Spreitzer, Michigan Ross", url: "https://michiganross.umich.edu/faculty-research/faculty/gretchen-spreitzer" },
+      { label: "Center for Positive Organizations", url: "https://positiveorgs.bus.umich.edu/" },
+      { label: "Thriving Meta-Analysis (Wiley)", url: "https://onlinelibrary.wiley.com/doi/full/10.1002/job.2375" },
+    ],
+  },
+];
+
+/* --- SLIDE 0 -- TITLE CARD ----------------------------------- */
+const Slide0 = ({ setShowAbout, generateHandout }) => {
+  const [hoverAbout, setHoverAbout] = useState(false);
+  const [hoverHandout, setHoverHandout] = useState(false);
+
+  const overlayBtnStyle = {
+    fontFamily: "'DM Sans', sans-serif",
+    fontSize: '11px',
+    fontWeight: '500',
+    letterSpacing: '0.15em',
+    textTransform: 'uppercase',
+    color: 'rgba(255,255,255,0.7)',
+    background: 'transparent',
+    border: '1px solid rgba(255,255,255,0.3)',
+    borderRadius: '6px',
+    padding: '8px 16px',
+    cursor: 'pointer',
+    transition: 'border-color 200ms, color 200ms',
+  };
+
+  return (
+    <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+      alignItems:'center', justifyContent:'center', position:'relative', padding:'3rem' }}>
+      <div style={{ position:'absolute', top:'2rem', left:'2.5rem', ...label }}>
+        Experience
+      </div>
+
+      {/* ABOUT and HANDOUT buttons - top right */}
+      <div style={{ position:'absolute', top:'2rem', right:'2.5rem', display:'flex', gap:'16px' }}>
+        <button
+          onClick={() => setShowAbout(true)}
+          onMouseEnter={() => setHoverAbout(true)}
+          onMouseLeave={() => setHoverAbout(false)}
+          style={{
+            ...overlayBtnStyle,
+            borderColor: hoverAbout ? '#00F0D0' : 'rgba(255,255,255,0.3)',
+            color: hoverAbout ? '#00F0D0' : 'rgba(255,255,255,0.7)',
+          }}>
+          ABOUT
+        </button>
+        <button
+          onClick={() => generateHandout()}
+          onMouseEnter={() => setHoverHandout(true)}
+          onMouseLeave={() => setHoverHandout(false)}
+          style={{
+            ...overlayBtnStyle,
+            borderColor: hoverHandout ? '#00F0D0' : 'rgba(255,255,255,0.3)',
+            color: hoverHandout ? '#00F0D0' : 'rgba(255,255,255,0.7)',
+          }}>
+          HANDOUT
+        </button>
+      </div>
+
+      <div style={{ textAlign:'center', maxWidth:'800px' }}>
+        <div style={{ fontFamily:"'Instrument Serif', serif",
+          fontSize:'clamp(52px,5vw,72px)', lineHeight:1.1 }}>
+          <div style={{ color: C.white }}>From Psychological Safety</div>
+          <div style={{ color: C.teal }}>to Authentic Leadership</div>
+        </div>
+        <hr style={{ border:'none', borderTop:`1px solid rgba(255,255,255,0.2)`,
+          width:'300px', margin:'1.8rem auto' }} />
+        <div style={{ fontFamily:"'DM Sans', sans-serif", fontSize:'12px',
+          fontWeight:'400', letterSpacing:'0.15em', textTransform:'uppercase',
+          color: C.grey }}>
+          A facilitated session for leadership teams
+        </div>
+      </div>
+      <div style={{ position:'absolute', bottom:'2rem', right:'2.5rem',
+        fontSize:'13px', color: C.grey,
+        animation:'pulse 2s ease-in-out infinite' }}>
+        Tap to begin &rarr;
+      </div>
+    </div>
+  );
+};
+
+/* --- SLIDE 1 -- WHAT DOES PS FEEL LIKE? -------------------- */
+const wordData = [
+  { word:'Safe',        left:14, top:18, size:28, opacity:0.7,  rot:-2 },
+  { word:'Trusted',     left:72, top:14, size:32, opacity:0.8,  rot:1  },
+  { word:'Heard',       left:44, top:8,  size:26, opacity:0.65, rot:-1 },
+  { word:'Respected',   left:82, top:32, size:30, opacity:0.75, rot:2  },
+  { word:'Valued',      left:18, top:48, size:34, opacity:0.85, rot:-3 },
+  { word:'Included',    left:58, top:22, size:28, opacity:0.7,  rot:1  },
+  { word:'Accepted',    left:33, top:38, size:26, opacity:0.6,  rot:-2 },
+  { word:'Open',        left:78, top:52, size:30, opacity:0.8,  rot:2  },
+  { word:'Calm',        left:8,  top:62, size:24, opacity:0.55, rot:0  },
+  { word:'Supported',   left:52, top:52, size:32, opacity:0.75, rot:-1 },
+  { word:'Confident',   left:22, top:72, size:28, opacity:0.7,  rot:3  },
+  { word:'Honest',      left:68, top:68, size:26, opacity:0.65, rot:-2 },
+  { word:'Free',        left:38, top:68, size:30, opacity:0.8,  rot:1  },
+  { word:'Secure',      left:84, top:74, size:28, opacity:0.7,  rot:-1 },
+  { word:'Brave',       left:12, top:38, size:26, opacity:0.65, rot:2  },
+  { word:'Relaxed',     left:58, top:78, size:24, opacity:0.6,  rot:-3 },
+  { word:'Encouraged',  left:48, top:30, size:32, opacity:0.75, rot:0  },
+  { word:'Connected',   left:28, top:16, size:28, opacity:0.7,  rot:-2 },
+  { word:'Understood',  left:66, top:42, size:26, opacity:0.65, rot:1  },
+  { word:'Human',       left:42, top:83, size:44, opacity:1.0,  rot:0,  color: C.teal },
+];
+
+const Slide1 = ({ step }) => (
+  <div style={{ width:'100%', height:'100%', position:'relative', overflow:'hidden' }}>
+
+    {/* Main question — shifts up and fades when sub-question appears, gone at step 2 */}
+    <div style={{
+      position:'absolute', top:'50%', left:'50%',
+      transform: step >= 1
+        ? 'translate(-50%, calc(-50% - 14vh))'
+        : 'translate(-50%, -50%)',
+      textAlign:'center', width:'80%',
+      transition:'opacity 600ms ease, transform 600ms ease',
+      opacity: step === 0 ? 1 : step === 1 ? 0.22 : 0,
+      pointerEvents:'none', zIndex: 2,
+    }}>
+      <div style={{ fontFamily:"'Instrument Serif', serif",
+        fontSize:'clamp(36px,4.5vw,60px)', color: C.white, lineHeight:1.2 }}>
+        What does psychological safety<br/>feel like?
+      </div>
+    </div>
+
+    {/* Sub-question — separate element so it gets full opacity independent of the parent */}
+    <div style={{
+      position:'absolute', top:'50%', left:'50%',
+      transform:'translate(-50%, -50%)',
+      textAlign:'center', width:'80%',
+      transition:'opacity 500ms ease',
+      opacity: step === 1 ? 1 : 0,
+      pointerEvents:'none', zIndex: 3,
+    }}>
+      <div style={{ fontFamily:"'Instrument Serif', serif",
+        fontSize:'clamp(28px,3.5vw,46px)', color: C.teal,
+        fontStyle:'italic', lineHeight:1.3 }}>
+        What is psychological safety?
+      </div>
+    </div>
+
+    {/* Word cloud */}
+    {step === 2 && (
+      <div style={{ position:'absolute', inset:0, zIndex:1 }}>
+        {wordData.map((w, i) => (
+          <div key={w.word} style={{
+            position:'absolute',
+            left: `${w.left}%`,
+            top: `${w.top}%`,
+            fontFamily:"'Instrument Serif', serif",
+            fontSize: `${w.size}px`,
+            color: w.color || C.white,
+            transform: `rotate(${w.rot}deg)`,
+            opacity: 0,
+            animation: `wordReveal 400ms ease-out forwards`,
+            animationDelay: `${i * 80}ms`,
+            animationFillMode: 'both',
+            userSelect: 'none',
+          }}>
+            {w.word}
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
+/* --- SLIDE 2 -- PART 1: THE SILENCE PROBLEM ---------------- */
+const Slide2 = () => (
+  <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center',
+    position:'relative', padding:'3rem 3rem 3rem 4rem', overflow:'hidden' }}>
+    <div style={bgNumeral()}>01</div>
+    <div style={{ position:'absolute', top:'2rem', left:'2.5rem', ...label }}>
+      Part One
+    </div>
+    <div style={{ maxWidth:'700px', position:'relative', zIndex:1 }}>
+      <div style={{ fontFamily:"'Instrument Serif', serif",
+        fontSize:'clamp(52px,5vw,72px)', color: C.white, lineHeight:1.1,
+        marginBottom:'1.5rem' }}>
+        The Silence Problem
+      </div>
+      <div style={{ fontSize:'20px', color:'rgba(255,255,255,0.55)',
+        fontWeight:'300', lineHeight:1.6, maxWidth:'600px' }}>
+        Why do smart, capable people choose not to speak? What are the costs?
+      </div>
+    </div>
+  </div>
+);
+
+/* --- SLIDE 3 -- THE QUADRANT FRAMEWORK --------------------- */
+const Slide3 = ({ step }) => {
+  const axisStyle = {
+    stroke: 'rgba(255,255,255,0.35)',
+    strokeWidth: 1,
+    strokeDasharray: step >= 1 ? 'none' : '1000',
+    strokeDashoffset: step >= 1 ? 0 : 1000,
+    transition: 'stroke-dashoffset 800ms ease-out',
+  };
+
+  const quadrants = [
+    {
+      label:'Comfortable Silence',
+      desc:'People care but don\'t speak. Issues fester. Conflict avoided \'to keep the peace.\' Feels safe but isn\'t productive.',
+      bg:'rgba(251,191,36,0.08)', border:'rgba(251,191,36,0.2)',
+      col: 0, row: 0,
+    },
+    {
+      label:'Psychological Safety ✓',
+      desc:'People care AND speak up. Disagreement is constructive. Challenge is welcomed. This is the target.',
+      bg:'rgba(0,240,208,0.08)', border:'rgba(0,240,208,0.3)',
+      glow: '0 0 20px rgba(0,240,208,0.12)',
+      col: 1, row: 0,
+    },
+    {
+      label:'Apathy',
+      desc:'People don\'t care and don\'t speak. Disengagement. Low energy. The team has given up.',
+      bg:'rgba(107,114,128,0.08)', border:'rgba(107,114,128,0.2)',
+      col: 0, row: 1,
+    },
+    {
+      label:'Aggressive Culture',
+      desc:'People don\'t care but do speak, to attack, blame, or dominate. Speaking up is weaponised.',
+      bg:'rgba(224,122,95,0.08)', border:'rgba(224,122,95,0.2)',
+      col: 1, row: 1,
+    },
+  ];
+
+  return (
+    <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+      alignItems:'center', justifyContent:'flex-start', padding:'1.5rem 2rem',
+      position:'relative', overflow:'hidden' }}>
+
+      <div style={{ ...label, marginBottom:'0.4rem' }}>"FRAMEWORK"</div>
+      <div style={{ fontFamily:"'Instrument Serif', serif", fontSize:'clamp(28px,3vw,40px)',
+        color: C.white, marginBottom:'1rem' }}>
+        The Silence Quadrant
+      </div>
+
+      {/* Grid area */}
+      <div style={{ position:'relative', width:'100%', flex:1, maxHeight:'65vh',
+        display:'flex', flexDirection:'column' }}>
+
+        {/* SVG Axes */}
+        {step >= 1 && (
+          <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%',
+            pointerEvents:'none', zIndex:1 }} preserveAspectRatio="none">
+            {/* Horizontal */}
+            <line x1="0%" y1="50%" x2="100%" y2="50%"
+              stroke="rgba(255,255,255,0.3)" strokeWidth="1"
+              strokeDasharray="1000" strokeDashoffset="0"
+              style={{ animation:'drawLine 800ms ease-out forwards' }} />
+            {/* Vertical */}
+            <line x1="50%" y1="0%" x2="50%" y2="100%"
+              stroke="rgba(255,255,255,0.3)" strokeWidth="1"
+              strokeDasharray="1000" strokeDashoffset="0"
+              style={{ animation:'drawLine 800ms ease-out 200ms forwards' }} />
+          </svg>
+        )}
+
+        {/* Axis labels */}
+        {step >= 1 && (
+          <>
+            <div style={{ position:'absolute', bottom:'-24px', left:'4px',
+              ...label, color:'rgba(255,255,255,0.4)', fontSize:'10px', zIndex:2 }}>
+              NOT SPEAKING UP &larr;
+            </div>
+            <div style={{ position:'absolute', bottom:'-24px', right:'4px',
+              ...label, color:'rgba(255,255,255,0.4)', fontSize:'10px', zIndex:2 }}>
+              &rarr; SPEAKING UP
+            </div>
+            <div style={{ position:'absolute', top:'4px', left:'51%',
+              ...label, color:'rgba(255,255,255,0.4)', fontSize:'10px', zIndex:2 }}>
+              &uarr; CARE
+            </div>
+            <div style={{ position:'absolute', bottom:'4px', left:'51%',
+              ...label, color:'rgba(255,255,255,0.4)', fontSize:'10px', zIndex:2 }}>
+              DON'T CARE &darr;
+            </div>
+          </>
+        )}
+
+        {/* Quadrant cards */}
+        {step >= 2 && (
+          <div className="quadrant-grid" style={{
+            display:'grid', gridTemplateColumns:'1fr 1fr',
+            gap:'6px', width:'100%', height:'100%', padding:'4px',
+          }}>
+            {quadrants.map((q, i) => (
+              <div key={q.label} style={{
+                background: q.bg,
+                border: `1px solid ${q.border}`,
+                borderRadius:'12px',
+                padding:'1rem 1.2rem',
+                boxShadow: q.glow || 'none',
+                opacity: 0,
+                animation: `fadeIn 500ms ease-out ${i * 100}ms forwards`,
+                overflow:'auto',
+              }}>
+                <div style={{ fontFamily:"'DM Sans', sans-serif", fontSize:'14px',
+                  fontWeight:'600', color: C.white, marginBottom:'0.5rem' }}>
+                  {q.label}
+                </div>
+                <div style={{ fontSize:'13px', color:'rgba(255,255,255,0.6)',
+                  lineHeight:1.5 }}>
+                  {q.desc}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Step 3 prompt */}
+      {step >= 3 && (
+        <div style={{ marginTop:'1.2rem', fontSize:'18px', color: C.teal,
+          fontStyle:'italic', textAlign:'center',
+          animation:'fadeIn 500ms ease-out forwards', opacity:0 }}>
+          Where does your team sit? Place yourselves honestly.
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* --- SLIDE 4 -- CASE STUDIES ------------------------------- */
+const Slide4 = () => (
+  <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+    padding:'2rem 2.5rem', overflow:'hidden' }}>
+    <div style={{ ...label, marginBottom:'0.8rem' }}>"CASE STUDIES"</div>
+    <div className="two-cards" style={{ display:'flex', gap:'1.5rem', flex:1,
+      overflow:'hidden' }}>
+      {[
+        {
+          title:'The Academic Department',
+          body:`A university faculty holds monthly all-staff meetings. The Dean asks for feedback on a proposed curriculum change. Silence. The Dean interprets this as agreement and proceeds. Three months later, implementation fails because staff who would have flagged problems, timetabling conflicts, resource gaps, student impact, didn't speak up. Post-mortem reveals: two people raised concerns privately but felt ignored; four assumed someone else would say it; the rest didn't think their input was wanted.`,
+          question:`What could the Dean have done differently in the first 30 seconds?`,
+        },
+        {
+          title:'The Professional Services Team',
+          body:`A consulting firm's project team is behind schedule. The project lead asks 'are we on track?' Everyone nods. Privately, three team members know the client deliverable has a critical error, but the last person who raised a problem was publicly criticised. The error ships. The client terminates the contract. Exit interviews reveal every team member knew about the problem but calculated that the personal risk of speaking up outweighed the professional risk of staying silent.`,
+          question:`What was the real cost of silence here, and who paid it?`,
+        },
+      ].map(card => (
+        <div key={card.title} style={{ ...glass, flex:1, display:'flex',
+          flexDirection:'column', overflow:'auto' }}>
+          <div style={{ fontFamily:"'DM Sans', sans-serif", fontSize:'18px',
+            fontWeight:'600', color: C.white, marginBottom:'1rem' }}>
+            {card.title}
+          </div>
+          <div style={{ fontSize:'15px', color:'rgba(255,255,255,0.6)',
+            lineHeight:1.7, flex:1 }}>
+            {card.body}
+          </div>
+          <div style={{ fontSize:'14px', color: C.teal, fontStyle:'italic',
+            marginTop:'1.2rem', paddingTop:'1rem',
+            borderTop:'1px solid rgba(255,255,255,0.08)' }}>
+            {card.question}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+/* --- SLIDE 5 -- PART 2: THE LEADER'S TOOLKIT --------------- */
+const Slide5 = () => (
+  <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center',
+    position:'relative', padding:'3rem 3rem 3rem 4rem', overflow:'hidden' }}>
+    <div style={bgNumeral()}>02</div>
+    <div style={{ position:'absolute', top:'2rem', left:'2.5rem', ...label }}>
+      Part Two
+    </div>
+    <div style={{ maxWidth:'700px', position:'relative', zIndex:1 }}>
+      <div style={{ fontFamily:"'Instrument Serif', serif",
+        fontSize:'clamp(52px,5vw,72px)', color: C.white, lineHeight:1.1,
+        marginBottom:'1.5rem' }}>
+        The Leader's Toolkit
+      </div>
+      <div style={{ fontSize:'20px', color:'rgba(255,255,255,0.55)',
+        fontWeight:'300', lineHeight:1.6 }}>
+        Five micro-behaviours that change everything.
+      </div>
+    </div>
+  </div>
+);
+
+/* --- SLIDE 6 -- FIVE BEHAVIOURS ---------------------------- */
+const behaviours = [
+  {
+    num:'1', title:'Ask the First Question',
+    desc:'In any meeting, ask a genuine question before stating a position. It signals that inquiry matters more than advocacy, and it gives people permission to think out loud.',
+  },
+  {
+    num:'2', title:'Admit Uncertainty',
+    desc:'"I\'m not sure about this" from a leader gives everyone in the room permission to be uncertain too. It models a learning orientation, and it\'s far more useful than false confidence.',
+  },
+  {
+    num:'3', title:'Acknowledge Mistakes',
+    desc:'"I got that wrong" normalises error as part of how a team learns and improves. Edmondson\'s research shows this is one of the clearest signals a leader can send.',
+  },
+  {
+    num:'4', title:'Invite Specific Contributions',
+    desc:'Not "does anyone have anything to add?" but "Sarah, you\'ve worked on this, what are we missing?" Directed invitations bring quiet voices into the room.',
+  },
+  {
+    num:'5', title:'Challenge Respectfully',
+    desc:'"I see it differently because..." then "Help me understand your thinking." Disagreement handled this way is a contribution, not an attack.',
+  },
+];
+
+const Slide6 = () => (
+  <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+    padding:'1.8rem 2.5rem', overflow:'hidden' }}>
+    <div style={{ ...label, marginBottom:'1rem' }}>Micro-Behaviours</div>
+    <div style={{ display:'flex', flexDirection:'column', flex:1,
+      justifyContent:'space-around', overflow:'auto' }}>
+      {behaviours.map((b, i) => (
+        <div key={b.num}>
+          <div style={{ display:'flex', alignItems:'flex-start', gap:'1.5rem',
+            padding:'0.8rem 0' }}>
+            <div style={{ fontFamily:"'Instrument Serif', serif", fontSize:'48px',
+              color: C.teal, lineHeight:1, minWidth:'2rem', flexShrink:0 }}>
+              {b.num}
+            </div>
+            <div>
+              <div style={{ fontFamily:"'DM Sans', sans-serif", fontSize:'18px',
+                fontWeight:'600', color: C.white, marginBottom:'0.3rem' }}>
+                {b.title}
+              </div>
+              <div style={{ fontSize:'15px', color:'rgba(255,255,255,0.55)',
+                lineHeight:1.55 }}>
+                {b.desc}
+              </div>
+            </div>
+          </div>
+          {i < behaviours.length - 1 && (
+            <div style={{ height:'1px', background:'rgba(255,255,255,0.07)' }} />
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+/* --- SLIDE 7 -- LEADERSHIP LESSON PROMPT ------------------- */
+const Slide7 = ({ step }) => (
+  <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+    alignItems:'center', justifyContent:'center', padding:'3rem',
+    textAlign:'center' }}>
+    <div style={{ fontFamily:"'Instrument Serif', serif",
+      fontSize:'clamp(36px,4vw,56px)', color: C.white, lineHeight:1.25,
+      maxWidth:'700px' }}>
+      "What's been the most important<br/>leadership lesson you've learnt?"
+    </div>
+    {step >= 1 && (
+      <div style={{ marginTop:'2.5rem', textAlign:'center' }}>
+        <div style={{ fontFamily:"'DM Sans', sans-serif", fontSize:'22px',
+          color: C.teal, fontStyle:'italic', lineHeight:1.6,
+          opacity:0, animation:'fadeIn 500ms ease-out forwards' }}>
+          Share how you got it wrong.
+        </div>
+        <div style={{ fontFamily:"'DM Sans', sans-serif", fontSize:'22px',
+          color: C.teal, fontStyle:'italic', lineHeight:1.6,
+          opacity:0, animation:'fadeIn 500ms ease-out 300ms forwards' }}>
+          Then share how you got it right.
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+/* --- SLIDE 8 -- PART 3: TRUST & THRIVING CULTURES ---------- */
+const Slide8 = () => (
+  <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center',
+    justifyContent:'center', position:'relative', overflow:'hidden' }}>
+    <div style={bgNumeral()}>03</div>
+    <div style={{ position:'absolute', top:'2rem', left:'2.5rem', ...label }}>
+      Part Three
+    </div>
+    <div style={{ textAlign:'center', position:'relative', zIndex:1 }}>
+      <div style={{ fontFamily:"'Instrument Serif', serif",
+        fontSize:'clamp(52px,6vw,80px)', lineHeight:1.1 }}>
+        <span style={{ color: C.white }}>Trust</span>
+        <span style={{ color:`rgba(255,255,255,0.6)` }}> &amp; </span>
+        <span style={{ color: C.teal }}>Thriving Cultures</span>
+      </div>
+      <div style={{ fontSize:'20px', color:'rgba(255,255,255,0.55)',
+        fontWeight:'300', lineHeight:1.6, marginTop:'1.2rem' }}>
+        What makes teams survive, and what makes them flourish?
+      </div>
+    </div>
+  </div>
+);
+
+/* --- SLIDE 9 -- TRUSTWORTHY LEADER ------------------------- */
+const trustWords = [
+  { word:'Consistent',  left:12, top:25, size:26, opacity:0.85, rot:-1 },
+  { word:'Competent',   left:70, top:20, size:28, opacity:0.8,  rot:1  },
+  { word:'Transparent', left:35, top:15, size:24, opacity:0.75, rot:-2 },
+  { word:'Vulnerable',  left:75, top:55, size:30, opacity:0.9,  rot:2  },
+  { word:'Reliable',    left:10, top:65, size:26, opacity:0.8,  rot:0  },
+  { word:'Caring',      left:50, top:70, size:32, opacity:0.85, rot:-1 },
+  { word:'Honest',      left:22, top:50, size:28, opacity:0.8,  rot:1  },
+  { word:'Accountable', left:62, top:38, size:24, opacity:0.75, rot:-2 },
+];
+
+const Slide9 = ({ step }) => (
+  <div style={{ width:'100%', height:'100%', position:'relative', overflow:'hidden',
+    display:'flex', alignItems:'center', justifyContent:'center' }}>
+    <div style={{ textAlign:'center', position:'relative', zIndex:2,
+      transition:'opacity 600ms ease', opacity: step >= 1 ? 0.4 : 1 }}>
+      <div style={{ fontFamily:"'Instrument Serif', serif",
+        fontSize:'clamp(36px,4vw,56px)', color: C.white, lineHeight:1.25 }}>
+        What does a trustworthy<br/>leader look like?
+      </div>
+    </div>
+
+    {step >= 1 && (
+      <div style={{ position:'absolute', inset:0, zIndex:1 }}>
+        {trustWords.map((w, i) => (
+          <div key={w.word} style={{
+            position:'absolute', left:`${w.left}%`, top:`${w.top}%`,
+            fontFamily:"'Instrument Serif', serif", fontSize:`${w.size}px`,
+            color: i % 2 === 0 ? C.teal : C.white,
+            transform:`rotate(${w.rot}deg)`,
+            opacity:0, animation:`wordReveal 400ms ease-out ${i*100}ms forwards`,
+            animationFillMode:'both', userSelect:'none',
+          }}>
+            {w.word}
+          </div>
+        ))}
+      </div>
+    )}
+
+    <div style={{ position:'absolute', bottom:'1.5rem', left:'50%',
+      transform:'translateX(-50%)', fontSize:'11px',
+      color:'rgba(156,163,175,0.5)', fontStyle:'italic', textAlign:'center',
+      whiteSpace:'nowrap' }}>
+      Mayer, Davis &amp; Schoorman (1995). Ability, Benevolence, Integrity
+    </div>
+  </div>
+);
+
+/* --- SLIDE 10 -- DISTRUSTING LEADER (INVERTED) ------------- */
+const distrustWords = [
+  { word:'Ego',            left:20, top:20, size:30, opacity:0.9,  rot:-1 },
+  { word:'Inconsistent',   left:55, top:18, size:26, opacity:0.85, rot:2  },
+  { word:'Secretive',      left:72, top:35, size:28, opacity:0.8,  rot:-2 },
+  { word:'Blame-shifting', left:15, top:50, size:24, opacity:0.9,  rot:1  },
+  { word:'Micromanaging',  left:48, top:55, size:32, opacity:0.85, rot:-1 },
+  { word:'Dismissive',     left:75, top:62, size:26, opacity:0.8,  rot:2  },
+  { word:'Defensive',      left:28, top:72, size:28, opacity:0.9,  rot:0  },
+  { word:'Self-serving',   left:60, top:75, size:30, opacity:0.85, rot:-2 },
+];
+
+const Slide10 = ({ step }) => (
+  <div style={{ width:'100%', height:'100%', background: C.cream,
+    position:'relative', overflow:'hidden',
+    display:'flex', alignItems:'center', justifyContent:'center' }}>
+    <div style={{ textAlign:'center', position:'relative', zIndex:2,
+      transition:'opacity 600ms ease', opacity: step >= 1 ? 0.3 : 1 }}>
+      <div style={{ fontFamily:"'Instrument Serif', serif",
+        fontSize:'clamp(36px,4vw,56px)', color: C.darkText, lineHeight:1.25 }}>
+        What does a distrusting<br/>leader look like?
+      </div>
+    </div>
+
+    {step >= 1 && (
+      <div style={{ position:'absolute', inset:0, zIndex:1 }}>
+        {distrustWords.map((w, i) => (
+          <div key={w.word} style={{
+            position:'absolute', left:`${w.left}%`, top:`${w.top}%`,
+            fontFamily:"'Instrument Serif', serif", fontSize:`${w.size}px`,
+            color: C.coral,
+            transform:`rotate(${w.rot}deg)`,
+            opacity:0, animation:`wordReveal 400ms ease-out ${i*100}ms forwards`,
+            animationFillMode:'both', userSelect:'none',
+          }}>
+            {w.word}
+          </div>
+        ))}
+      </div>
+    )}
+
+    <div style={{ position:'absolute', bottom:'1.5rem', left:'50%',
+      transform:'translateX(-50%)', fontSize:'11px',
+      color:`rgba(26,26,46,0.4)`, fontStyle:'italic', textAlign:'center',
+      maxWidth:'600px', whiteSpace:'nowrap' }}>
+      Lipman-Blumen (2010): Toxic leadership inflicts serious and enduring harm on followers and organisations.
+    </div>
+  </div>
+);
+
+/* --- SLIDE 11 -- SOUND LIKE -------------------------------- */
+const soundWords = [
+  { text:'Laughter',                                        left:8,  top:12, size:40, teal:false, rot:-2 },
+  { text:'Overlapping voices',                              left:52, top:8,  size:22, teal:false, rot:1  },
+  { text:'"What if we..."',                                 left:24, top:22, size:30, teal:true,  rot:-1 },
+  { text:'Silence... then someone thinks aloud',            left:60, top:20, size:17, teal:false, rot:2  },
+  { text:'"I don\'t know yet"',                            left:6,  top:40, size:26, teal:true,  rot:0  },
+  { text:'Quick back-and-forth',                            left:44, top:33, size:22, teal:false, rot:-2 },
+  { text:'Someone finishing someone else\'s sentence',      left:14, top:58, size:16, teal:false, rot:1  },
+  { text:'"That\'s interesting because..."',                left:58, top:42, size:21, teal:true,  rot:-1 },
+  { text:'A challenge met with curiosity',                  left:4,  top:72, size:18, teal:false, rot:0  },
+  { text:'Side conversations that feed back',               left:48, top:60, size:18, teal:false, rot:2  },
+  { text:'"Help me understand"',                            left:70, top:28, size:28, teal:true,  rot:-2 },
+  { text:'Energy rising',                                   left:32, top:68, size:36, teal:false, rot:1  },
+  { text:'"Yes, and..."',                                   left:76, top:52, size:32, teal:true,  rot:-1 },
+  { text:'Names being used',                                left:18, top:82, size:22, teal:false, rot:0  },
+  { text:'Equal airtime',                                   left:54, top:76, size:26, teal:false, rot:-2 },
+  { text:'The quiet one speaking, and everyone leaning in', left:28, top:45, size:15, teal:false, rot:1  },
+];
+
+const SlideSound = ({ step }) => (
+  <div style={{ width:'100%', height:'100%', position:'relative', overflow:'hidden' }}>
+    <div style={{ position:'absolute', top:'2rem', left:'2.5rem',
+      ...label, color: C.coral }}>
+      Provocation
+    </div>
+
+    {/* Main question */}
+    <div style={{
+      position:'absolute',
+      top: step >= 1 ? '15%' : '50%',
+      left:'50%',
+      transform: step >= 1 ? 'translateX(-50%)' : 'translate(-50%, -50%)',
+      textAlign:'center', width:'80%',
+      transition:'opacity 600ms ease, top 600ms ease, transform 600ms ease',
+      opacity: step >= 1 ? 0.2 : 1,
+      zIndex:2, pointerEvents:'none',
+    }}>
+      <div style={{ fontFamily:"'Instrument Serif', serif",
+        fontSize:'clamp(36px,4vw,56px)', color: C.white, lineHeight:1.25 }}>
+        What does a high-performance team sound like?
+      </div>
+    </div>
+
+    {/* Word cloud at step 1+ */}
+    {step >= 1 && (
+      <div style={{ position:'absolute', inset:0, zIndex:1 }}>
+        {soundWords.map((w, i) => (
+          <div key={i} style={{
+            position:'absolute',
+            left:`${w.left}%`,
+            top:`${w.top}%`,
+            fontFamily:"'Instrument Serif', serif",
+            fontSize:`${w.size}px`,
+            color: step >= 2 ? (w.teal ? `rgba(0,240,208,0.2)` : `rgba(255,255,255,0.2)`) : (w.teal ? C.teal : C.white),
+            transform:`rotate(${w.rot}deg)`,
+            opacity:0,
+            animation:`wordReveal 400ms ease-out forwards`,
+            animationDelay:`${i*100}ms`,
+            animationFillMode:'both',
+            transition:'color 400ms ease',
+            userSelect:'none',
+          }}>
+            {w.text}
+          </div>
+        ))}
+      </div>
+    )}
+
+    {/* Step 2: provocation line */}
+    {step >= 2 && (
+      <div style={{
+        position:'absolute', bottom:'30%', left:'50%',
+        transform:'translateX(-50%)',
+        textAlign:'center', zIndex:3,
+        opacity:0, animation:'fadeIn 500ms ease-out forwards',
+      }}>
+        <div style={{ fontFamily:"'Instrument Serif', serif",
+          fontSize:'22px', color: C.coral, fontStyle:'italic' }}>
+          "Now, what does your team actually sound like?"
+        </div>
+      </div>
+    )}
+
+    {/* Research note */}
+    {step >= 2 && (
+      <div style={{
+        position:'absolute', bottom:'1.5rem', left:'50%',
+        transform:'translateX(-50%)',
+        fontSize:'11px', color:'rgba(156,163,175,0.5)',
+        fontStyle:'italic', textAlign:'center', zIndex:3,
+        whiteSpace:'nowrap',
+        opacity:0, animation:'fadeIn 500ms ease-out 200ms forwards',
+        animationFillMode:'both',
+      }}>
+        Pentland (2012): Communication patterns, not content, predicted one-third of the variation in team productivity.
+      </div>
+    )}
+  </div>
+);
+
+/* --- SLIDE 12 -- INGREDIENTS ------------------------------- */
+const ingredientCards = [
+  { num:'01', label:'TRUST',         desc:'People believe their colleagues will act with integrity, competence, and genuine care. They are willing to be vulnerable, to admit mistakes, ask for help, and take interpersonal risks, because they have confidence in each other.', cite:'Mayer, Davis & Schoorman (1995)' },
+  { num:'02', label:'OPENNESS',      desc:'Information flows broadly, not on a need-to-know basis. People share strategic context, decision rationale, performance data, and bad news. When everyone sees the bigger picture, everyone makes better decisions.', cite:'Spreitzer et al. (2005)' },
+  { num:'03', label:'UNDERSTANDING', desc:'Leaders genuinely know their people, their capabilities, context, and judgement. This enables them to grant real decision-making discretion. People are not just consulted; they are trusted to act.', cite:'Spreitzer et al. (2005); Deci & Ryan (2000)' },
+  { num:'04', label:'VITALITY',      desc:'People feel energised, alive, and that their work has a sense of positive spark. Not just "not tired", but actively charged. Vitality comes from meaningful work, positive social interactions, and the autonomy to direct your own effort.', cite:'Porath, Spreitzer, Gibson & Garnett (2012)' },
+  { num:'05', label:'LEARNING',      desc:'People feel they are continuously improving, growing, and developing. Not through formal training programmes, but through the felt sense of getting better at what matters. Learning comes from exploration, feedback, and the freedom to experiment.', cite:'Spreitzer et al. (2005)' },
+  { num:'06', label:'CONNECTION',    desc:'People relate to each other with care and awareness. They know how their work connects to others. They have back-channel conversations, side exchanges, and the kind of relational density that Pentland\'s research shows predicts team performance.', cite:'Pentland (2012); Dutton & Heaphy (2003)' },
+];
+
+const SlideIngredients = ({ step }) => {
+  const [openCard, setOpenCard] = useState(null);
+  return (
+    <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+      alignItems:'center', padding:'2rem 2.5rem', overflow:'hidden' }}>
+      <div style={{ ...label, alignSelf:'flex-start', marginBottom:'0.8rem' }}>Question</div>
+
+      {/* Question */}
+      <div style={{
+        fontFamily:"'Instrument Serif', serif",
+        fontSize:'clamp(36px,4vw,52px)',
+        color: C.white, textAlign:'center',
+        transition:'opacity 500ms ease, transform 500ms ease',
+        opacity: step >= 1 ? 0.25 : 1,
+        transform: step >= 1 ? 'translateY(-10px)' : 'translateY(0)',
+        marginBottom: step >= 1 ? '1rem' : '0',
+        flexShrink:0,
+      }}>
+        What are the ingredients of a thriving team?
+      </div>
+
+      {/* Cards grid */}
+      {step >= 1 && (
+        <div style={{
+          display:'flex', flexWrap:'wrap', gap:'0.8rem',
+          maxWidth:'900px', justifyContent:'center',
+          flex:1, overflow:'auto', paddingTop:'0.5rem',
+        }}>
+          {ingredientCards.map((card, i) => {
+            const isOpen = openCard === i;
+            return (
+              <div key={i}
+                onMouseEnter={() => setOpenCard(i)}
+                onMouseLeave={() => setOpenCard(null)}
+                onClick={() => setOpenCard(isOpen ? null : i)}
+                style={{
+                  ...glass,
+                  background: isOpen ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.05)',
+                  border: `1px solid ${isOpen ? 'rgba(0,240,208,0.35)' : 'rgba(0,240,208,0.2)'}`,
+                  padding:'1rem',
+                  width:'calc(33% - 0.6rem)',
+                  minWidth:'200px',
+                  flexShrink:0,
+                  cursor:'pointer',
+                  transition:'background 300ms ease, border 300ms ease',
+                  opacity:0,
+                  animation:`fadeIn 400ms ease-out ${i*80}ms forwards`,
+                  animationFillMode:'both',
+                  display:'flex', flexDirection:'column',
+                }}>
+                <div style={{ fontFamily:"'Instrument Serif', serif",
+                  fontSize:'30px', color: C.teal, lineHeight:1,
+                  marginBottom:'0.4rem' }}>
+                  {card.num}
+                </div>
+                <div style={{ fontFamily:"'DM Sans', sans-serif", fontSize:'13px',
+                  fontWeight:'600', color: C.white, letterSpacing:'0.1em',
+                  textTransform:'uppercase', textAlign:'center',
+                  marginBottom: isOpen ? '0.6rem' : '0',
+                  transition:'margin 300ms ease' }}>
+                  {card.label}
+                </div>
+                <div style={{
+                  fontSize:'13px', color:'rgba(255,255,255,0.85)', lineHeight:1.6,
+                  maxHeight: isOpen ? '200px' : '0',
+                  overflow:'hidden',
+                  opacity: isOpen ? 1 : 0,
+                  transition:'max-height 300ms ease, opacity 300ms ease',
+                }}>
+                  {card.desc}
+                </div>
+                {isOpen && (
+                  <div style={{ fontSize:'10px', color: C.grey, fontStyle:'italic',
+                    marginTop:'0.5rem' }}>
+                    {card.cite}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Connecting statement */}
+      {step >= 1 && (
+        <div style={{ textAlign:'center', marginTop:'0.8rem', flexShrink:0,
+          opacity:0, animation:'fadeIn 500ms ease-out 800ms forwards',
+          animationFillMode:'both' }}>
+          <div style={{ fontFamily:"'Instrument Serif', serif",
+            fontSize:'20px', color: C.teal, fontStyle:'italic' }}>
+            Thriving = Vitality + Learning.
+          </div>
+          <div style={{ fontSize:'18px', color: C.white, marginTop:'0.3rem' }}>
+            But you cannot get there without Trust, Openness, and Understanding.
+          </div>
+          <div style={{ fontSize:'11px', color: C.grey, marginTop:'0.3rem' }}>
+            Spreitzer, Sutcliffe, Dutton, Sonenshein &amp; Grant (2005)
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* --- SLIDE 13 -- THRIVING MODEL ---------------------------- */
+const SlideThrivingModel = ({ step }) => (
+  <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+    alignItems:'center', justifyContent:'flex-start',
+    padding:'2rem 2.5rem', overflow:'hidden' }}>
+
+    <div style={{ ...label, alignSelf:'flex-start', marginBottom:'0.5rem' }}>Research</div>
+    <div style={{ fontFamily:"'Instrument Serif', serif",
+      fontSize:'clamp(28px,3vw,40px)', color: C.white, textAlign:'center',
+      marginBottom:'0.3rem' }}>
+      The Socially Embedded Model of Thriving at Work
+    </div>
+    <div style={{ fontSize:'13px', color: C.grey, marginBottom:'1.2rem',
+      textAlign:'center' }}>
+      Spreitzer, Sutcliffe, Dutton, Sonenshein &amp; Grant, Organization Science, 2005
+    </div>
+
+    {/* SVG Flow Diagram */}
+    {step >= 1 && (
+      <div style={{ width:'100%', maxWidth:'820px', overflow:'auto',
+        opacity:0, animation:'fadeIn 500ms ease-out forwards' }}>
+        <svg viewBox="0 0 780 280" width="100%" style={{ display:'block' }}>
+          <defs>
+            <marker id="arrowTeal" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="rgba(0,240,208,0.7)" />
+            </marker>
+          </defs>
+
+          {/* Column 1 boxes */}
+          {[
+            { y:20, label:'Trust & Respect' },
+            { y:100, label:'Broad Information Sharing', sublabel:'OPENNESS' },
+            { y:180, label:'Decision-Making Discretion', sublabel:'UNDERSTANDING' },
+          ].map((box, i) => (
+            <g key={i} style={{ opacity:0, animation:`fadeIn 400ms ease-out ${i*100}ms forwards`, animationFillMode:'both' }}>
+              <rect x="10" y={box.y} width="170" height="60" rx="8"
+                fill="rgba(0,240,208,0.08)" stroke={C.teal} strokeWidth="1.5" />
+              {box.sublabel && (
+                <text x="95" y={box.y + 10} textAnchor="middle"
+                  fontSize="9" fill={C.teal} fontFamily="DM Sans">{box.sublabel}</text>
+              )}
+              <text x="95" y={box.sublabel ? box.y + 35 : box.y + 35} textAnchor="middle"
+                dominantBaseline="middle" fontSize="13" fill="white" fontFamily="DM Sans">
+                {box.label}
+              </text>
+            </g>
+          ))}
+
+          {/* Column 2 boxes */}
+          {[
+            { y:20,  label:'Task Focus',       desc:'Absorption in meaningful work' },
+            { y:100, label:'Exploration',       desc:'Seeking new ideas' },
+            { y:180, label:'Heedful Relating',  desc:'Awareness of how work connects' },
+          ].map((box, i) => (
+            <g key={i} style={{ opacity:0, animation:`fadeIn 400ms ease-out ${(i+3)*100}ms forwards`, animationFillMode:'both' }}>
+              <rect x="300" y={box.y} width="170" height="60" rx="8"
+                fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+              <text x="385" y={box.y + 26} textAnchor="middle"
+                fontSize="13" fill="white" fontFamily="DM Sans" fontWeight="600">{box.label}</text>
+              <text x="385" y={box.y + 43} textAnchor="middle"
+                fontSize="10" fill={C.grey} fontFamily="DM Sans">{box.desc}</text>
+            </g>
+          ))}
+
+          {/* Column 3: tall teal box */}
+          <g style={{ opacity:0, animation:'fadeIn 400ms ease-out 700ms forwards', animationFillMode:'both' }}>
+            <rect x="590" y="30" width="170" height="220" rx="8"
+              fill={C.teal} />
+            <text x="675" y="90" textAnchor="middle"
+              fontSize="14" fontWeight="bold" fill="#0A0F1C" fontFamily="DM Sans">VITALITY</text>
+            <text x="675" y="107" textAnchor="middle"
+              fontSize="10" fill="#0A0F1C" fontFamily="DM Sans">Feeling energised</text>
+            <text x="675" y="132" textAnchor="middle"
+              fontSize="20" fill="#0A0F1C" fontFamily="DM Sans">+</text>
+            <text x="675" y="158" textAnchor="middle"
+              fontSize="14" fontWeight="bold" fill="#0A0F1C" fontFamily="DM Sans">LEARNING</text>
+            <text x="675" y="175" textAnchor="middle"
+              fontSize="10" fill="#0A0F1C" fontFamily="DM Sans">Sense of growth</text>
+            <text x="675" y="200" textAnchor="middle"
+              fontSize="20" fill="#0A0F1C" fontFamily="DM Sans">=</text>
+            <text x="675" y="224" textAnchor="middle"
+              fontSize="20" fontWeight="bold" fill="#0A0F1C" fontFamily="DM Sans">THRIVING</text>
+          </g>
+
+          {/* Arrows col1 -> col2 */}
+          {[50, 130, 210].map((y, i) => (
+            <line key={i} x1="180" y1={y} x2="298" y2={y}
+              stroke="rgba(0,240,208,0.7)" strokeWidth="1.5"
+              markerEnd="url(#arrowTeal)"
+              strokeDasharray="120" strokeDashoffset="120"
+              style={{ animation:`drawLine 600ms ease-out ${800+i*100}ms forwards`, animationFillMode:'both' }} />
+          ))}
+
+          {/* Arrows col2 -> col3 */}
+          {[50, 130, 210].map((y, i) => (
+            <line key={i} x1="472" y1={y} x2="588" y2="140"
+              stroke="rgba(0,240,208,0.5)" strokeWidth="1.2"
+              markerEnd="url(#arrowTeal)"
+              strokeDasharray="200" strokeDashoffset="200"
+              style={{ animation:`drawLine 600ms ease-out ${1100+i*100}ms forwards`, animationFillMode:'both' }} />
+          ))}
+        </svg>
+      </div>
+    )}
+
+    {/* Outcomes row at step 2 */}
+    {step >= 2 && (
+      <div style={{ marginTop:'1rem',
+        opacity:0, animation:'fadeIn 500ms ease-out forwards', animationFillMode:'both' }}>
+        <div style={{ display:'flex', gap:'1.5rem', flexWrap:'wrap',
+          justifyContent:'center', marginBottom:'0.5rem' }}>
+          {['Better health','Higher performance','Stronger commitment','Lower burnout','More innovation'].map((o, i) => (
+            <div key={i} style={{ fontSize:'14px', color: C.grey,
+              opacity:0, animation:`fadeIn 400ms ease-out ${i*80}ms forwards`,
+              animationFillMode:'both' }}>
+              <span style={{ color: C.teal }}>&#9679; </span>{o}
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize:'11px', color:'rgba(156,163,175,0.6)',
+          textAlign:'center', fontStyle:'italic' }}>
+          Meta-analysis: Kleine, Rudolph &amp; Zacher (2019), 73 studies, 21,739 employees
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+/* --- SLIDE 14 -- THRIVING EQUATION ------------------------- */
+const SlideThrivingEquation = ({ step }) => {
+  const [lineVisible, setLineVisible] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setLineVisible(true), 100);
+    return () => clearTimeout(t);
+  }, []);
+
+  const hrStyle = {
+    border:'none', borderTop:`1px solid rgba(255,255,255,0.2)`,
+    display:'block', margin:'0.8rem auto',
+    width: lineVisible ? '300px' : '0px',
+    transition:'width 800ms ease-out',
+  };
+
+  return (
+    <div style={{ width:'100%', height:'100%', display:'flex',
+      alignItems:'center', justifyContent:'center', padding:'3rem' }}>
+      <div style={{ maxWidth:'700px', width:'100%', textAlign:'center' }}>
+
+        {/* Line 1 */}
+        <div style={{ fontFamily:"'Instrument Serif', serif",
+          fontSize:'clamp(32px,3.5vw,48px)', lineHeight:1.3 }}>
+          <span style={{ color: C.white }}>Trust</span>
+          <span style={{ color: C.teal }}> + </span>
+          <span style={{ color: C.white }}>Openness</span>
+          <span style={{ color: C.teal }}> + </span>
+          <span style={{ color: C.white }}>Understanding</span>
+        </div>
+
+        <hr style={hrStyle} />
+
+        {/* Line 2 */}
+        <div style={{ fontSize:'18px', color: C.grey, fontStyle:'italic',
+          lineHeight:1.6 }}>
+          People take initiative. People explore. People relate with care.
+        </div>
+
+        <hr style={hrStyle} />
+
+        {/* Line 3 */}
+        <div style={{ fontFamily:"'Instrument Serif', serif",
+          fontSize:'clamp(24px,3vw,36px)', color: C.teal }}>
+          Vitality + Learning
+        </div>
+
+        <hr style={hrStyle} />
+
+        {/* Line 4 */}
+        <div style={{ fontFamily:"'Instrument Serif', serif",
+          fontSize:'clamp(60px,8vw,96px)', color: C.teal, lineHeight:1,
+          textShadow:'0 0 60px rgba(0,240,208,0.3), 0 0 120px rgba(0,240,208,0.15)' }}>
+          = THRIVING
+        </div>
+
+        {/* Step 1 provocation */}
+        {step >= 1 && (
+          <div style={{ marginTop:'1.5rem', fontSize:'16px', color: C.coral,
+            fontStyle:'italic', maxWidth:'600px', margin:'1.5rem auto 0',
+            lineHeight:1.6,
+            opacity:0, animation:'fadeIn 500ms ease-out forwards' }}>
+            "The conference discussed these as values. The research says they are measurable enabling conditions with a documented causal pathway to performance."
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/* --- SLIDE 15 -- MISSING LINK ------------------------------ */
+const SlideMissingLink = ({ step }) => (
+  <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+    alignItems:'center', justifyContent:'center', padding:'3rem',
+    position:'relative', overflow:'hidden' }}>
+
+    <div style={{ position:'absolute', top:'2rem', left:'2.5rem',
+      ...label, color: C.coral }}>
+      Challenge
+    </div>
+
+    {/* Step 0/1 heading */}
+    <div style={{
+      fontFamily:"'Instrument Serif', serif",
+      fontSize:'clamp(28px,3vw,42px)', color: C.white,
+      textAlign:'center', maxWidth:'800px',
+      transition:'opacity 500ms ease, transform 500ms ease',
+      opacity: step >= 1 ? 0.3 : 1,
+      transform: step >= 1 ? 'translateY(-40px)' : 'translateY(0)',
+    }}>
+      The First Sea Lord spoke about Trust, Respect, Understanding, and Openness.
+    </div>
+
+    {/* Step 1 body */}
+    {step >= 1 && (
+      <div style={{ maxWidth:'700px', textAlign:'center', lineHeight:1.7,
+        opacity:0, animation:'fadeIn 500ms ease-out forwards', animationFillMode:'both' }}>
+        <p style={{ fontSize:'18px', color: C.white, marginBottom:'1rem' }}>
+          Spreitzer's research shows these are not just values. They are the three structural conditions that enable people to thrive.
+        </p>
+        <p style={{ fontSize:'18px', color: C.white }}>
+          Without all three, you get{' '}
+          <span style={{ textDecoration:'line-through', color:'rgba(255,255,255,0.4)' }}>compliance</span>.
+          {' '}Not{' '}
+          <span style={{ color: C.teal }}>thriving</span>.
+        </p>
+      </div>
+    )}
+
+    {/* Step 2 prompt */}
+    {step >= 2 && (
+      <div style={{ marginTop:'2rem', fontSize:'20px', color: C.teal,
+        fontStyle:'italic', textAlign:'center', maxWidth:'700px',
+        opacity:0, animation:'fadeIn 500ms ease-out forwards', animationFillMode:'both' }}>
+        "Which of these three is weakest in your team right now? Trust? Openness? Understanding?"
+      </div>
+    )}
+  </div>
+);
+
+/* --- SLIDE 16 -- SCENARIO 1 -------------------------------- */
+const scenario1Options = [
+  { id:'A', title:'Restructure the Meetings',  desc:'Replace group-only weekly meetings with rotating cross-group problem-solving sessions.' },
+  { id:'B', title:'Create Boundary Spanners',  desc:'Appoint one person from each group as a formal cross-group connector with dedicated time for collaboration.' },
+  { id:'C', title:'Change the Physical Space', desc:'Synchronise coffee breaks across all groups. Redesign seating so groups are physically interspersed.' },
+  { id:'D', title:'Start with a Shared Challenge', desc:'Set a single high-profile interdisciplinary grant bid as a forcing function, with a cross-group team and a 90-day deadline.' },
+];
+
+const scenario1Reveals = {
+  A: { tag:'RESEARCH SAYS', body:'Partially effective. Cross-functional meetings increase information flow (Pentland\'s Exploration dimension), but without psychological safety, people will not contribute outside their expertise zone. Edmondson (1999) found that structural changes alone do not create speaking-up behaviour. Leader modelling is required.', missing:'Trust. People need to feel safe being a non-expert in someone else\'s domain.', lens:'This addresses Openness (information sharing) but not Understanding (autonomy) or Trust.' },
+  B: { tag:'RESEARCH SAYS', body:'Strong evidence. Pentland\'s research showed that the highest-performing teams had members who periodically went outside the group and brought information back. Tushman (1977) coined the term "boundary spanner" for individuals who bridge disconnected groups. This role must have time, status, and permission, not be an unfunded add-on.', missing:'This only works if the boundary spanners are trusted by all groups and have genuine discretion to act.', lens:'Addresses Openness and Understanding. Trust is the precondition.' },
+  C: { tag:'RESEARCH SAYS', body:'The strongest single intervention in Pentland\'s research. When a bank synchronised coffee breaks so team members socialised together, productivity in the lowest-performing teams increased by over 20%. Physical proximity and informal interaction are the most reliable predictors of collaboration. Allen (1977) showed that communication frequency drops sharply with physical distance.', missing:'Physical proximity creates opportunity for connection but does not guarantee quality. If underlying distrust or status hierarchies exist, people will sit together and still not talk.', lens:'Creates conditions for all three: Trust (informal relationship building), Openness (information flowing through casual exchange), Understanding (people learn what others actually do).' },
+  D: { tag:'RESEARCH SAYS', body:'Effective if managed well. Sherif\'s (1954) Robbers Cave experiment showed that intergroup conflict is best resolved by superordinate goals. Hackman (2002) found that compelling direction is the single most important condition for team effectiveness. The risk: a pressured deadline without psychological safety will reproduce existing power dynamics.', missing:'The shared challenge must be genuinely interdisciplinary, with each group\'s contribution visibly essential. If one group can carry it alone, the silos will persist.', lens:'Creates Understanding (people see each other\'s value) and can build Trust through shared experience. Openness must be actively designed in.' },
+};
+
+const SlideScenario1 = () => {
+  const [selected, setSelected] = useState(null);
+  return (
+    <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+      padding:'1.5rem 2rem', overflow:'hidden', position:'relative' }}>
+
+      {/* Background numeral */}
+      <div style={{ position:'absolute', right:'-20px', top:'50%',
+        transform:'translateY(-50%)',
+        fontFamily:"'Instrument Serif', serif", fontSize:'220px', fontWeight:'700',
+        color:'rgba(0,240,208,0.1)', lineHeight:1,
+        userSelect:'none', pointerEvents:'none', zIndex:0 }}>01</div>
+
+      <div style={{ ...label, color: C.coral, marginBottom:'0.3rem' }}>Scenario</div>
+      <div style={{ fontFamily:"'Instrument Serif', serif", fontSize:'36px',
+        color: C.white, marginBottom:'0.8rem', position:'relative', zIndex:1 }}>
+        The Research Institute
+      </div>
+
+      <div style={{ display:'flex', gap:'1.2rem', flex:1, overflow:'hidden',
+        position:'relative', zIndex:1 }}>
+
+        {/* Left: scenario text */}
+        <div style={{ ...glass, width:'45%', flexShrink:0, overflow:'auto',
+          fontSize:'15px', color:'rgba(255,255,255,0.75)', lineHeight:1.75 }}>
+          <p style={{ marginBottom:'0.8rem' }}>A university research institute has five specialist groups: data science, clinical trials, policy, public engagement, and methodology. Each group is excellent in isolation. They publish well, win grants, and are respected in their fields.</p>
+          <p style={{ marginBottom:'0.8rem' }}>But the institute is failing to win the large interdisciplinary grants that its strategy depends on. Cross-group collaboration is almost non-existent. Each group has its own weekly meeting, its own Slack channels, its own coffee run. When the Director calls all-hands meetings, people sit in their group clusters. Questions are only asked within groups, never across them.</p>
+          <p style={{ marginBottom:'0.8rem' }}>A junior researcher privately tells the Director: "I had an idea that needed input from three groups. I didn't know who to ask, I didn't want to look stupid, and honestly, I didn't think anyone outside my group would care."</p>
+          <p>The Director recognises the problem but doesn't know where to start.</p>
+        </div>
+
+        {/* Right: options + reveal */}
+        <div style={{ flex:1, display:'flex', flexDirection:'column',
+          overflow:'auto', gap:'0.8rem' }}>
+
+          {/* Options grid */}
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr',
+            gap:'0.7rem', flexShrink:0 }}>
+            {scenario1Options.map(opt => (
+              <div key={opt.id}
+                onClick={() => setSelected(opt.id)}
+                style={{
+                  ...glass,
+                  padding:'1rem',
+                  cursor:'pointer',
+                  opacity: selected !== null && selected !== opt.id ? 0.3 : 1,
+                  boxShadow: selected === opt.id
+                    ? '0 0 0 2px rgba(0,240,208,0.8)' : 'none',
+                  transition:'opacity 300ms ease, box-shadow 200ms ease',
+                  minHeight:'100px',
+                }}>
+                <div style={{ fontFamily:"'DM Sans', sans-serif", fontSize:'11px',
+                  fontWeight:'600', color: C.teal, letterSpacing:'0.12em',
+                  marginBottom:'0.4rem' }}>
+                  {opt.id}
+                </div>
+                <div style={{ fontSize:'14px', fontWeight:'600',
+                  color: C.white, marginBottom:'0.3rem' }}>
+                  {opt.title}
+                </div>
+                <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.6)',
+                  lineHeight:1.5 }}>
+                  {opt.desc}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Reveal */}
+          {selected && (
+            <div style={{ ...glass,
+              opacity:0, animation:'fadeIn 400ms ease-out forwards',
+              animationFillMode:'both', flexShrink:0 }}>
+              <div style={{ ...label, color: C.teal, marginBottom:'0.5rem' }}>
+                {scenario1Reveals[selected].tag}
+              </div>
+              <p style={{ fontSize:'14px', color: C.white, lineHeight:1.6,
+                marginBottom:'0.6rem' }}>
+                {scenario1Reveals[selected].body}
+              </p>
+              <div style={{ ...label, color: C.coral, fontSize:'10px',
+                marginBottom:'0.2rem' }}>
+                What's Missing:
+              </div>
+              <p style={{ fontSize:'13px', color:'rgba(255,255,255,0.75)',
+                lineHeight:1.5, marginBottom:'0.6rem' }}>
+                {scenario1Reveals[selected].missing}
+              </p>
+              <div style={{ ...label, color: C.teal, fontSize:'10px',
+                marginBottom:'0.2rem' }}>
+                Thriving Lens:
+              </div>
+              <p style={{ fontSize:'13px', color:'rgba(255,255,255,0.75)',
+                lineHeight:1.5 }}>
+                {scenario1Reveals[selected].lens}
+              </p>
+            </div>
+          )}
+
+          {/* Synthesis */}
+          {selected && (
+            <div style={{ fontSize:'13px', color: C.teal, fontStyle:'italic',
+              lineHeight:1.6,
+              opacity:0, animation:'fadeIn 400ms ease-out 300ms forwards',
+              animationFillMode:'both' }}>
+              The research suggests the best answer is: all four, sequenced. Start with C (proximity), add B (connectors), use D (shared challenge) as the catalyst, and redesign A (meetings) once trust exists.
+            </div>
+          )}
+
+          {/* Reset */}
+          {selected && (
+            <div style={{ display:'flex', justifyContent:'flex-end', flexShrink:0 }}>
+              <button onClick={() => setSelected(null)}
+                style={{ fontSize:'11px', color: C.teal,
+                  background:'transparent',
+                  border:`1px solid ${C.teal}`,
+                  borderRadius:'6px', padding:'5px 12px',
+                  cursor:'pointer', fontFamily:"'DM Sans', sans-serif",
+                  letterSpacing:'0.08em' }}>
+                RESET
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* --- SLIDE 17 -- SCENARIO 2 -------------------------------- */
+const scenario2Options = [
+  { id:'A', title:'Redesign the Agenda',           desc:'Cut updates to written pre-reads. Use meeting time for one strategic discussion per week where everyone contributes.' },
+  { id:'B', title:'Introduce Pair Shadowing',       desc:'Each leadership team member spends half a day per month in a colleague\'s area, attending their meetings and meeting their people.' },
+  { id:'C', title:'Create a Shared Vulnerability Ritual', desc:'Start each Monday with a 10-minute round: "What\'s keeping you up at night this week?" No solutions, just listening.' },
+  { id:'D', title:'Run a Team Diagnostic',          desc:'Use Pentland\'s Energy-Engagement-Exploration framework to map the team\'s actual communication patterns. Share the results openly.' },
+];
+
+const scenario2Reveals = {
+  A: { tag:'RESEARCH SAYS', body:'Necessary but not sufficient. Hackman (2002) identified enabling structure as one of six conditions for team effectiveness. Moving from broadcast mode (updates) to deliberation mode (strategic discussion) increases Engagement in Pentland\'s framework. But the content of discussion only improves if people feel safe to disagree.', missing:'An agenda redesign changes the container, not the culture. If the VC still dominates, or if dissent is subtly punished, the new format will produce the same dynamics in a different shape.', lens:'Addresses Openness (richer information flow) but needs Trust (safety to challenge) and Understanding (knowing each other\'s worlds) to work.' },
+  B: { tag:'RESEARCH SAYS', body:'Directly builds Understanding, the most neglected of the three thriving conditions. When leaders physically inhabit a colleague\'s context, they develop cognitive empathy for the pressures and trade-offs of that domain. Nonaka and Takeuchi (1995) call this "socialization", the transfer of tacit knowledge through shared experience, which cannot be achieved through reports or presentations.', missing:'This requires genuine curiosity and humility. A senior leader "shadowing" can feel performative or surveillance-like if the intent is not authentic.', lens:'Strongest on Understanding. Builds Trust through presence and genuine interest. Creates Openness naturally as informal conversations happen.' },
+  C: { tag:'RESEARCH SAYS', body:'Directly models the leader vulnerability that Edmondson identifies as the single strongest lever for psychological safety. Brown (2012) found that vulnerability is the birthplace of connection, creativity, and trust, but only when it is genuine, not performed. "What\'s keeping you up at night?" normalises uncertainty at the top. It signals: we don\'t have to pretend everything is under control.', missing:'The "no solutions" rule is critical. If people start problem-solving each other\'s worries, it becomes another task meeting. The purpose is connection, not resolution.', lens:'Strongest on Trust. Creates conditions for Openness (people share real information, not curated updates). Builds Understanding over time as people hear each other\'s actual pressures.' },
+  D: { tag:'RESEARCH SAYS', body:'Pentland\'s sociometric research showed that making communication patterns visible was itself an intervention. Leaders who saw that they dominated airtime changed behaviour immediately. The Exploration metric in particular reveals whether a team is looking inward or outward. Hackman (2002) found that coaching is most effective when grounded in objective data about team process.', missing:'Data without psychological safety produces defensiveness, not change. The results must be shared in a way that is curious, not punitive.', lens:'Provides the raw material for all three conditions, but only if the conversation about the data is held in a climate of Trust.' },
+};
+
+const SlideScenario2 = () => {
+  const [selected, setSelected] = useState(null);
+  return (
+    <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+      padding:'1.5rem 2rem', overflow:'hidden', position:'relative' }}>
+
+      {/* Background numeral */}
+      <div style={{ position:'absolute', right:'-20px', top:'50%',
+        transform:'translateY(-50%)',
+        fontFamily:"'Instrument Serif', serif", fontSize:'220px', fontWeight:'700',
+        color:'rgba(0,240,208,0.1)', lineHeight:1,
+        userSelect:'none', pointerEvents:'none', zIndex:0 }}>02</div>
+
+      <div style={{ ...label, color: C.coral, marginBottom:'0.3rem' }}>Scenario</div>
+      <div style={{ fontFamily:"'Instrument Serif', serif", fontSize:'36px',
+        color: C.white, marginBottom:'0.8rem', position:'relative', zIndex:1 }}>
+        The Senior Leadership Team
+      </div>
+
+      <div style={{ display:'flex', gap:'1.2rem', flex:1, overflow:'hidden',
+        position:'relative', zIndex:1 }}>
+
+        {/* Left: scenario text */}
+        <div style={{ ...glass, width:'45%', flexShrink:0, overflow:'auto',
+          fontSize:'15px', color:'rgba(255,255,255,0.75)', lineHeight:1.75 }}>
+          <p style={{ marginBottom:'0.8rem' }}>A university's senior leadership team (8 members) meets every Monday morning. The Vice-Chancellor chairs. The agenda is packed: finance, student numbers, estates, HR, compliance. Each member gives a 5-minute update on their area. There is rarely time for discussion. Questions are functional: "When is that report due?" "Who is leading on that?"</p>
+          <p style={{ marginBottom:'0.8rem' }}>The meetings are efficient. They run to time. Everyone is polite.</p>
+          <p style={{ marginBottom:'0.8rem' }}>But a staff survey reveals that departments feel disconnected from central strategy. Middle managers say they receive information late and inconsistently. Two members of the leadership team privately admit they don't know what the person sitting next to them actually does day-to-day. One says: "We share a meeting, but we don't share a mission."</p>
+          <p>A new Deputy Vice-Chancellor joins and, after her first month, tells the VC: "Your leadership team is a reporting group, not a team. You have proximity without connection."</p>
+        </div>
+
+        {/* Right: options + reveal */}
+        <div style={{ flex:1, display:'flex', flexDirection:'column',
+          overflow:'auto', gap:'0.8rem' }}>
+
+          {/* Options grid */}
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr',
+            gap:'0.7rem', flexShrink:0 }}>
+            {scenario2Options.map(opt => (
+              <div key={opt.id}
+                onClick={() => setSelected(opt.id)}
+                style={{
+                  ...glass,
+                  padding:'1rem',
+                  cursor:'pointer',
+                  opacity: selected !== null && selected !== opt.id ? 0.3 : 1,
+                  boxShadow: selected === opt.id
+                    ? '0 0 0 2px rgba(0,240,208,0.8)' : 'none',
+                  transition:'opacity 300ms ease, box-shadow 200ms ease',
+                  minHeight:'100px',
+                }}>
+                <div style={{ fontFamily:"'DM Sans', sans-serif", fontSize:'11px',
+                  fontWeight:'600', color: C.teal, letterSpacing:'0.12em',
+                  marginBottom:'0.4rem' }}>
+                  {opt.id}
+                </div>
+                <div style={{ fontSize:'14px', fontWeight:'600',
+                  color: C.white, marginBottom:'0.3rem' }}>
+                  {opt.title}
+                </div>
+                <div style={{ fontSize:'12px', color:'rgba(255,255,255,0.6)',
+                  lineHeight:1.5 }}>
+                  {opt.desc}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Reveal */}
+          {selected && (
+            <div style={{ ...glass,
+              opacity:0, animation:'fadeIn 400ms ease-out forwards',
+              animationFillMode:'both', flexShrink:0 }}>
+              <div style={{ ...label, color: C.teal, marginBottom:'0.5rem' }}>
+                {scenario2Reveals[selected].tag}
+              </div>
+              <p style={{ fontSize:'14px', color: C.white, lineHeight:1.6,
+                marginBottom:'0.6rem' }}>
+                {scenario2Reveals[selected].body}
+              </p>
+              <div style={{ ...label, color: C.coral, fontSize:'10px',
+                marginBottom:'0.2rem' }}>
+                What's Missing:
+              </div>
+              <p style={{ fontSize:'13px', color:'rgba(255,255,255,0.75)',
+                lineHeight:1.5, marginBottom:'0.6rem' }}>
+                {scenario2Reveals[selected].missing}
+              </p>
+              <div style={{ ...label, color: C.teal, fontSize:'10px',
+                marginBottom:'0.2rem' }}>
+                Thriving Lens:
+              </div>
+              <p style={{ fontSize:'13px', color:'rgba(255,255,255,0.75)',
+                lineHeight:1.5 }}>
+                {scenario2Reveals[selected].lens}
+              </p>
+            </div>
+          )}
+
+          {/* Synthesis */}
+          {selected && (
+            <div style={{ fontSize:'13px', color: C.teal, fontStyle:'italic',
+              lineHeight:1.6,
+              opacity:0, animation:'fadeIn 400ms ease-out 300ms forwards',
+              animationFillMode:'both' }}>
+              The new DVC's insight was precise: proximity without connection. The answer starts with C (vulnerability builds trust), then B (shadowing builds understanding), then A (the agenda can finally support real strategic conversation), with D (the diagnostic) as the mirror that keeps the team honest.
+            </div>
+          )}
+
+          {/* Reset */}
+          {selected && (
+            <div style={{ display:'flex', justifyContent:'flex-end', flexShrink:0 }}>
+              <button onClick={() => setSelected(null)}
+                style={{ fontSize:'11px', color: C.teal,
+                  background:'transparent',
+                  border:`1px solid ${C.teal}`,
+                  borderRadius:'6px', padding:'5px 12px',
+                  cursor:'pointer', fontFamily:"'DM Sans', sans-serif",
+                  letterSpacing:'0.08em' }}>
+                RESET
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* --- SLIDE 18 -- SCIENCE OF TEAM COMMUNICATION ------------- */
+const Slide18 = () => (
+  <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center',
+    position:'relative', padding:'3rem 3rem 3rem 4rem', overflow:'hidden' }}>
+    <div style={{ maxWidth:'750px', position:'relative', zIndex:1 }}>
+      <div style={{ ...label, marginBottom:'1rem' }}>Research</div>
+      <div style={{ fontFamily:"'Instrument Serif', serif",
+        fontSize:'clamp(38px,4vw,56px)', color: C.white, lineHeight:1.15,
+        marginBottom:'1rem' }}>
+        The Science of Team Communication
+      </div>
+      <div style={{ fontSize:'16px', color: C.grey, marginBottom:'1.5rem',
+        fontStyle:'italic' }}>
+        Pentland's sociometric badge research, MIT Human Dynamics Laboratory
+      </div>
+      <div style={{ fontSize:'18px', color:'rgba(255,255,255,0.6)',
+        lineHeight:1.75, maxWidth:'700px' }}>
+        Using electronic badges to measure communication behaviour across industries,
+        Pentland's team found that communication patterns, not content, were the
+        strongest predictors of team performance. Three dimensions predicted success:
+      </div>
+    </div>
+  </div>
+);
+
+/* --- SLIDE 19 -- ENERGY, ENGAGEMENT, EXPLORATION ----------- */
+const EnergySVG = () => {
+  const nodes = [
+    {id:'A',x:100,y:100,r:12,strong:true},
+    {id:'B',x:150,y:60, r:10,strong:true},
+    {id:'C',x:55, y:65, r:11,strong:true},
+    {id:'D',x:170,y:130,r:7, strong:false},
+    {id:'E',x:130,y:155,r:8, strong:false},
+    {id:'F',x:65, y:140,r:6, strong:false},
+    {id:'G',x:35, y:100,r:9, strong:false},
+    {id:'H',x:85, y:170,r:8, strong:false},
+    {id:'I',x:165,y:175,r:7, strong:false},
+  ];
+  const cx=100,cy=120;
+  return (
+    <svg viewBox="0 0 200 200" width="180" height="180" style={{display:'block',margin:'1rem auto 0'}}>
+      <circle cx={cx} cy={cy} r="80" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
+      {nodes.map(n=>(
+        <line key={n.id} x1={n.x} y1={n.y} x2={cx} y2={cy}
+          stroke={n.strong?'rgba(168,224,108,0.8)':'rgba(168,224,108,0.3)'}
+          strokeWidth={n.strong?3:0.8}/>
+      ))}
+      {nodes.map(n=>(
+        <g key={n.id}>
+          <circle cx={n.x} cy={n.y} r={n.r}
+            fill={n.strong?'#A8E06C':'rgba(168,224,108,0.4)'}/>
+          <text x={n.x} y={n.y+1} textAnchor="middle" dominantBaseline="middle"
+            fontSize="7" fill="#0A0F1C" fontFamily="DM Sans">{n.id}</text>
+        </g>
+      ))}
+    </svg>
+  );
+};
+
+const EngagementSVG = () => {
+  const n=9, cx=100, cy=100, r=70;
+  const pts = Array.from({length:n},(_,i)=>{
+    const a=(2*Math.PI*i/n)-Math.PI/2;
+    return {x:cx+r*Math.cos(a),y:cy+r*Math.sin(a),id:String.fromCharCode(65+i)};
+  });
+  const strong=[[0,1],[1,2],[0,2]];
+  const pairs=[];
+  for(let i=0;i<n;i++) for(let j=i+1;j<n;j++) pairs.push([i,j]);
+  return (
+    <svg viewBox="0 0 200 200" width="180" height="180" style={{display:'block',margin:'1rem auto 0'}}>
+      {pairs.map(([i,j])=>{
+        const isStrong=strong.some(([a,b])=>(a===i&&b===j)||(a===j&&b===i));
+        const isG=(i===6||j===6)&&(i<=2||j<=2);
+        return (
+          <line key={`${i}-${j}`} x1={pts[i].x} y1={pts[i].y} x2={pts[j].x} y2={pts[j].y}
+            stroke={isStrong?'rgba(0,240,208,0.7)':'rgba(255,255,255,0.1)'}
+            strokeWidth={isStrong?3.5:isG?1:0.5}/>
+        );
+      })}
+      {pts.map((p,i)=>(
+        <g key={p.id}>
+          <circle cx={p.x} cy={p.y} r="10"
+            fill={i<3?'#00F0D0':'rgba(0,240,208,0.3)'}/>
+          <text x={p.x} y={p.y+1} textAnchor="middle" dominantBaseline="middle"
+            fontSize="7" fill="#0A0F1C" fontFamily="DM Sans">{p.id}</text>
+        </g>
+      ))}
+    </svg>
+  );
+};
+
+const ExplorationSVG = () => {
+  const teams = [
+    {label:'2',  int:40, ext:15},
+    {label:'3',  int:55, ext:20},
+    {label:'4',  int:35, ext:30},
+    {label:'5',  int:50, ext:25},
+    {label:'6',  int:45, ext:35},
+    {label:'7',  int:30, ext:45},
+    {label:'8',  int:60, ext:18},
+    {label:'9',  int:42, ext:28},
+    {label:'10', int:38, ext:32},
+    {label:'Mgmt',int:25,ext:55},
+  ];
+  const maxVal=120, bh=12, gap=4, svgW=200, svgH=teams.length*(bh+gap)+20;
+  return (
+    <svg viewBox={`0 0 ${svgW} ${svgH}`} width="200" height={svgH}
+      style={{display:'block',margin:'1rem auto 0'}}>
+      {teams.map((t,i)=>{
+        const y=i*(bh+gap)+10;
+        const intW=(t.int/maxVal)*120;
+        const extW=(t.ext/maxVal)*120;
+        return (
+          <g key={t.label}>
+            <text x="22" y={y+bh/2+1} textAnchor="end" dominantBaseline="middle"
+              fontSize="7" fill="rgba(255,255,255,0.5)" fontFamily="DM Sans">{t.label}</text>
+            <rect x="25" y={y} width={intW} height={bh} rx="2"
+              fill="rgba(0,240,208,0.6)"/>
+            <rect x={25+intW} y={y} width={extW} height={bh} rx="2"
+              fill="rgba(0,240,208,0.25)"/>
+          </g>
+        );
+      })}
+      <text x="25" y={svgH-2} fontSize="6" fill="rgba(255,255,255,0.3)"
+        fontFamily="DM Sans">Internal &#9632; Between-team &#9632;</text>
+    </svg>
+  );
+};
+
+const Slide19 = () => {
+  const cards = [
+    {
+      icon:'⚡', title:'Energy',
+      desc:'How much team members contribute to the team as a whole. Total exchanges, weighted by type. A team\'s energy is the sum of all individual contributions.',
+      svg: <EnergySVG />,
+    },
+    {
+      icon:'🔗', title:'Engagement',
+      desc:'How team members communicate with each other, not just the leader. High engagement means dense, distributed connections. Low engagement means hub-and-spoke.',
+      svg: <EngagementSVG />,
+    },
+    {
+      icon:'🔭', title:'Exploration',
+      desc:'How much members connect outside the team and bring information back. Teams that only talk internally stagnate.',
+      svg: <ExplorationSVG />,
+    },
+  ];
+  return (
+    <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+      padding:'1.5rem 2rem', overflow:'hidden' }}>
+      <div className="three-cards" style={{ display:'flex', gap:'1.2rem', flex:1,
+        overflow:'hidden', alignItems:'stretch' }}>
+        {cards.map(card=>(
+          <div key={card.title} style={{ ...glass, flex:1, display:'flex',
+            flexDirection:'column', overflow:'auto', padding:'1.4rem' }}>
+            <div style={{ fontSize:'28px', marginBottom:'0.5rem' }}>{card.icon}</div>
+            <div style={{ fontFamily:"'DM Sans', sans-serif", fontSize:'20px',
+              fontWeight:'600', color: C.white, marginBottom:'0.6rem' }}>
+              {card.title}
+            </div>
+            <div style={{ fontSize:'14px', color:'rgba(255,255,255,0.6)',
+              lineHeight:1.6 }}>
+              {card.desc}
+            </div>
+            {card.svg}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* --- SLIDE 20 -- INTERACTIVE TEAM MAP ---------------------- */
+const TeamMapSVG = ({ members, generated, synergy, showComm, showSynergy }) => {
+  if (!generated) {
+    return (
+      <div style={{ flex:1, display:'flex', alignItems:'center',
+        justifyContent:'center', color:'rgba(255,255,255,0.3)',
+        fontSize:'15px', fontStyle:'italic', textAlign:'center' }}>
+        Configure your team and<br/>generate the map
+      </div>
+    );
+  }
+  const n = members.length;
+  const svgSize = 440;
+  const cx = svgSize / 2, cy = svgSize / 2;
+  const radius = svgSize * 0.36;
+
+  const positions = members.map((_, i) => {
+    const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+    return { x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
+  });
+
+  const commStyle = (freq) => {
+    if (freq === 4) return { sw: 7,   opacity: 0.92, stroke: C.teal,                dash: 'none' };
+    if (freq === 3) return { sw: 4.5, opacity: 0.78, stroke: C.teal,                dash: 'none' };
+    if (freq === 2) return { sw: 3,   opacity: 0.55, stroke: 'rgba(156,163,175,1)', dash: 'none' };
+    if (freq === 1) return { sw: 1.8, opacity: 0.4,  stroke: 'rgba(156,163,175,1)', dash: 'none' };
+    return null; // 0 = Avoid: no line
+  };
+
+  const synStyle = (rating) => {
+    if (rating === 4) return { sw: 6,   opacity: 0.88, stroke: C.coral };
+    if (rating === 3) return { sw: 4,   opacity: 0.72, stroke: C.coral };
+    if (rating === 2) return { sw: 2.5, opacity: 0.52, stroke: C.coral };
+    if (rating === 1) return { sw: 1.5, opacity: 0.32, stroke: C.coral };
+    return null; // 0 = Avoid: no line
+  };
+
+  const nodeRadius = (freq) => {
+    if (freq === 4) return 20;
+    if (freq === 3) return 17;
+    if (freq === 2) return 14;
+    if (freq === 1) return 11;
+    return 10;
+  };
+
+  // Build synergy line arrays imperatively to avoid nested-map issues
+  const synYouLines = [];
+  const synPeerLines = [];
+  if (showSynergy) {
+    members.forEach((m, i) => {
+      const key = `y-${i}`;
+      const rating = synergy[key] !== undefined ? synergy[key] : 2;
+      const s = synStyle(rating);
+      if (s) synYouLines.push({ i, s });
+    });
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const key = `${i}-${j}`;
+        const rating = synergy[key] !== undefined ? synergy[key] : 2;
+        const s = synStyle(rating);
+        if (s) synPeerLines.push({ i, j, s });
+      }
+    }
+  }
+
+  return (
+    <svg viewBox={`0 0 ${svgSize} ${svgSize}`}
+      style={{ width:'100%', maxWidth:'480px', display:'block', margin:'0 auto' }}>
+
+      {/* Guide circle */}
+      <circle cx={cx} cy={cy} r={radius}
+        fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4,6"/>
+
+      {/* COMMUNICATION: spokes from centre to each member */}
+      {showComm && members.map((m, i) => {
+        const s = commStyle(m.freq);
+        if (!s) return null;
+        const pos = positions[i];
+        return (
+          <line key={`comm-${i}`}
+            x1={cx} y1={cy} x2={pos.x} y2={pos.y}
+            stroke={s.stroke} strokeWidth={s.sw} strokeOpacity={s.opacity}
+            strokeDasharray={s.dash}
+            style={{ opacity:0, animation:`fadeIn 500ms ease-out ${i*80}ms forwards`,
+              animationFillMode:'both' }}
+          />
+        );
+      })}
+
+      {/* SYNERGY: YOU to each member */}
+      {synYouLines.map(({ i, s }) => (
+        <line key={`syn-you-${i}`}
+          x1={cx} y1={cy} x2={positions[i].x} y2={positions[i].y}
+          stroke={s.stroke} strokeWidth={s.sw} strokeOpacity={s.opacity}
+        />
+      ))}
+
+      {/* SYNERGY: peer-to-peer connections */}
+      {synPeerLines.map(({ i, j, s }) => (
+        <line key={`syn-peer-${i}-${j}`}
+          x1={positions[i].x} y1={positions[i].y}
+          x2={positions[j].x} y2={positions[j].y}
+          stroke={s.stroke} strokeWidth={s.sw} strokeOpacity={s.opacity}
+        />
+      ))}
+
+      {/* Outer member nodes — drawn above lines */}
+      {members.map((m, i) => {
+        const pos = positions[i];
+        const r = nodeRadius(m.freq);
+        const isAvoid = m.freq === 0;
+        const fill   = isAvoid ? 'rgba(156,163,175,0.25)' : C.teal;
+        const stroke = isAvoid ? 'rgba(156,163,175,0.3)'  : 'rgba(0,240,208,0.4)';
+        const textFill = isAvoid ? 'rgba(156,163,175,0.7)' : '#0A0F1C';
+        return (
+          <g key={`node-${i}`} style={{ opacity:0,
+            animation:`nodeAppear 300ms ease-out ${i*100}ms forwards`,
+            animationFillMode:'both' }}>
+            <circle cx={pos.x} cy={pos.y} r={r}
+              fill={fill} stroke={stroke} strokeWidth="1.5"/>
+            <text x={pos.x} y={pos.y+1} textAnchor="middle"
+              dominantBaseline="middle" fontSize={r >= 17 ? '11' : '9'}
+              fontFamily="DM Sans" fontWeight="600" fill={textFill}>
+              {(m.name || '?').slice(0,3)}
+            </text>
+          </g>
+        );
+      })}
+
+      {/* Centre YOU node */}
+      <g style={{ opacity:0, animation:'nodeAppear 400ms ease-out 0ms forwards',
+        animationFillMode:'both' }}>
+        <circle cx={cx} cy={cy} r="24"
+          fill={C.teal} stroke="rgba(0,240,208,0.5)" strokeWidth="3"/>
+        <text x={cx} y={cy+1} textAnchor="middle" dominantBaseline="middle"
+          fontSize="12" fontFamily="DM Sans" fontWeight="700" fill="#0A0F1C">
+          YOU
+        </text>
+      </g>
+    </svg>
+  );
+};
+
+const archetypeCards = [
+  { icon:'🔗', name:'The Connector',        desc:'Dense ties to everyone. High engagement. The person who holds the team together informally.' },
+  { icon:'🔭', name:'The Explorer',          desc:'Fewer internal ties but strong external links. Brings back ideas, contacts, and perspectives from outside.' },
+  { icon:'🎯', name:'The Quiet Contributor', desc:'Few visible connections but deep task focus. Often undervalued in communication maps but essential to output.' },
+  { icon:'📢', name:'The Amplifier',         desc:'High energy contribution. Energises others through the quality and frequency of their interaction.' },
+];
+
+const Slide20 = ({ step, teamSize, setTeamSize, teamMembers,
+  setTeamMembers, mapGenerated, setMapGenerated }) => {
+
+  const [synergy, setSynergy]         = useState({});
+  const [showComm, setShowComm]       = useState(true);
+  const [showSynergy, setShowSynergy] = useState(false);
+  const [inputTab, setInputTab]       = useState('comm');
+
+  const handleSizeChange = (e) => {
+    const n = Math.min(15, Math.max(3, parseInt(e.target.value) || 3));
+    setTeamSize(n);
+    setTeamMembers(prev => {
+      const next = [...prev];
+      while (next.length < n) next.push({ name: String.fromCharCode(65 + next.length), freq: 2 });
+      return next.slice(0, n);
+    });
+    setMapGenerated(false);
+  };
+
+  const handleName = (i, val) => {
+    setTeamMembers(prev => prev.map((m, idx) => idx === i ? { ...m, name: val } : m));
+  };
+
+  const handleFreq = (i, val) => {
+    setTeamMembers(prev => prev.map((m, idx) => idx === i ? { ...m, freq: parseInt(val) } : m));
+  };
+
+  // Build synergy input rows before JSX return
+  const youPairRows = teamMembers.map((m, i) => {
+    const key = `y-${i}`;
+    const val = synergy[key] !== undefined ? synergy[key] : 2;
+    return (
+      <div key={key} style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+        <span style={{ fontSize:'12px', color: C.white, width:'68px', flexShrink:0 }}>
+          You / {m.name || String.fromCharCode(65 + i)}
+        </span>
+        <select value={val}
+          onChange={e => setSynergy(prev => ({ ...prev, [key]: parseInt(e.target.value) }))}
+          style={{ flex:1 }}>
+          <option value={0}>Avoid</option>
+          <option value={1}>Low</option>
+          <option value={2}>Moderate</option>
+          <option value={3}>High</option>
+          <option value={4}>Strong</option>
+        </select>
+      </div>
+    );
+  });
+
+  const peerPairRows = [];
+  for (let i = 0; i < teamMembers.length; i++) {
+    for (let j = i + 1; j < teamMembers.length; j++) {
+      const key = `${i}-${j}`;
+      const val = synergy[key] !== undefined ? synergy[key] : 2;
+      const nameA = teamMembers[i].name || String.fromCharCode(65 + i);
+      const nameB = teamMembers[j].name || String.fromCharCode(65 + j);
+      peerPairRows.push(
+        <div key={key} style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+          <span style={{ fontSize:'12px', color: C.white, width:'68px', flexShrink:0 }}>
+            {nameA} / {nameB}
+          </span>
+          <select value={val}
+            onChange={e => setSynergy(prev => ({ ...prev, [key]: parseInt(e.target.value) }))}
+            style={{ flex:1 }}>
+            <option value={0}>Avoid</option>
+            <option value={1}>Low</option>
+            <option value={2}>Moderate</option>
+            <option value={3}>High</option>
+            <option value={4}>Strong</option>
+          </select>
+        </div>
+      );
+    }
+  }
+
+  const tabBtnStyle = (id) => ({
+    flex: 1, padding: '7px 4px',
+    background: inputTab === id
+      ? (id === 'comm' ? 'rgba(0,240,208,0.1)' : 'rgba(224,122,95,0.1)')
+      : 'transparent',
+    color: inputTab === id ? (id === 'comm' ? C.teal : C.coral) : C.grey,
+    border: 'none',
+    borderBottom: inputTab === id
+      ? `2px solid ${id === 'comm' ? C.teal : C.coral}`
+      : '2px solid transparent',
+    cursor: 'pointer', fontSize: '11px',
+    fontFamily: "'DM Sans', sans-serif",
+    letterSpacing: '0.08em', textTransform: 'uppercase',
+    transition: 'all 200ms',
+  });
+
+  const layerBtnStyle = (active, activeCol) => ({
+    padding: '5px 14px',
+    background: active ? activeCol : 'transparent',
+    color: active ? (activeCol === C.teal ? '#0A0F1C' : '#fff') : activeCol,
+    border: `1px solid ${activeCol}`,
+    borderRadius: '20px', cursor: 'pointer',
+    fontSize: '11px', fontFamily: "'DM Sans', sans-serif",
+    letterSpacing: '0.08em', textTransform: 'uppercase',
+    transition: 'all 200ms', fontWeight: '500',
+  });
+
+  return (
+    <div style={{ width:'100%', height:'100%', display:'flex',
+      flexDirection:'column', padding:'1.5rem 2rem', overflow:'hidden' }}>
+      <div style={{ ...label, marginBottom:'0.3rem' }}>Interactive</div>
+      <div style={{ fontFamily:"'Instrument Serif', serif", fontSize:'36px',
+        color: C.white, lineHeight:1.1 }}>Map Your Team</div>
+      <div style={{ fontSize:'13px', color: C.grey, marginTop:'0.3rem', marginBottom:'0.8rem' }}>
+        Rate your communication with each team member. You appear at the centre.
+      </div>
+
+      <div className="team-layout" style={{ display:'flex', gap:'1.5rem', flex:1,
+        overflow:'hidden', minHeight:0 }}>
+
+        {/* Left: tabbed input panel */}
+        <div style={{ ...glass, width:'320px', flexShrink:0, display:'flex',
+          flexDirection:'column', overflow:'hidden', padding:'1rem' }}>
+
+          <div style={{ display:'flex', alignItems:'center', gap:'0.8rem', marginBottom:'0.8rem' }}>
+            <span style={{ fontSize:'13px', color: C.grey }}>Team size:</span>
+            <input type="number" min={3} max={15} value={teamSize}
+              onChange={handleSizeChange} />
+          </div>
+
+          {/* Tabs */}
+          <div style={{ display:'flex', borderBottom:'1px solid rgba(255,255,255,0.08)',
+            marginBottom:'0.6rem' }}>
+            <button style={tabBtnStyle('comm')}
+              onClick={() => setInputTab('comm')}>Communication</button>
+            <button style={tabBtnStyle('synergy')}
+              onClick={() => setInputTab('synergy')}>Synergy</button>
+          </div>
+
+          {/* Tab content */}
+          <div style={{ flex:1, overflowY:'auto', display:'flex',
+            flexDirection:'column', gap:'6px' }}>
+
+            {inputTab === 'comm' && teamMembers.map((m, i) => (
+              <div key={i} style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+                <input type="text" maxLength={3} value={m.name}
+                  onChange={e => handleName(i, e.target.value)} placeholder="A" />
+                <select value={m.freq} onChange={e => handleFreq(i, e.target.value)}
+                  style={{ flex:1 }}>
+                  <option value={0}>Avoid</option>
+                  <option value={1}>Rarely</option>
+                  <option value={2}>Sometimes</option>
+                  <option value={3}>Often</option>
+                  <option value={4}>Constantly</option>
+                </select>
+              </div>
+            ))}
+
+            {inputTab === 'synergy' && (
+              <>
+                <div style={{ fontSize:'11px', color: C.grey, lineHeight:1.5, marginBottom:'6px' }}>
+                  Rate social and task connection between each pair.
+                </div>
+                <div style={{ fontSize:'10px', color: C.coral, letterSpacing:'0.12em',
+                  textTransform:'uppercase', marginBottom:'4px' }}>You + Peers</div>
+                {youPairRows}
+                <div style={{ fontSize:'10px', color: C.coral, letterSpacing:'0.12em',
+                  textTransform:'uppercase', marginTop:'10px', marginBottom:'4px' }}>Peer Pairs</div>
+                {peerPairRows}
+              </>
+            )}
+          </div>
+
+          <button onClick={() => setMapGenerated(true)}
+            style={{ marginTop:'0.7rem', padding:'0.65rem 1rem',
+              background: C.teal, color: C.darkText,
+              fontFamily:"'DM Sans', sans-serif", fontSize:'13px',
+              fontWeight:'600', border:'none', borderRadius:'10px',
+              cursor:'pointer', transition:'filter 200ms', letterSpacing:'0.04em' }}
+            onMouseEnter={e => e.target.style.filter='brightness(1.15)'}
+            onMouseLeave={e => e.target.style.filter='brightness(1)'}>
+            Generate Map
+          </button>
+        </div>
+
+        {/* Right: layer toggles + SVG */}
+        <div style={{ flex:1, display:'flex', flexDirection:'column',
+          alignItems:'center', justifyContent:'flex-start', overflow:'auto' }}>
+
+          {/* Layer toggle buttons */}
+          <div style={{ display:'flex', gap:'10px', marginBottom:'0.8rem', alignSelf:'flex-start' }}>
+            <button style={layerBtnStyle(showComm, C.teal)}
+              onClick={() => setShowComm(v => !v)}>
+              Communication
+            </button>
+            <button style={layerBtnStyle(showSynergy, C.coral)}
+              onClick={() => setShowSynergy(v => !v)}>
+              Synergy
+            </button>
+          </div>
+
+          <TeamMapSVG members={teamMembers} generated={mapGenerated}
+            synergy={synergy} showComm={showComm} showSynergy={showSynergy} />
+
+          {step === 1 && (
+            <div style={{ marginTop:'1.2rem', maxWidth:'560px', textAlign:'center' }}>
+              <div style={{ fontFamily:"'Instrument Serif',serif", fontSize:'clamp(22px,2.5vw,30px)',
+                color: C.coral, fontStyle:'italic', marginBottom:'0.8rem',
+                opacity:0, animation:'fadeIn 500ms ease-out forwards', animationFillMode:'both' }}>
+                "How does this map change if your team is under threat?"
+              </div>
+              <div style={{ fontSize:'15px', color: C.grey, lineHeight:1.8,
+                opacity:0, animation:'fadeIn 500ms ease-out 300ms forwards', animationFillMode:'both' }}>
+                Do connections tighten or fracture?<br/>
+                Does the leader centralise or distribute?<br/>
+                Does exploration stop?
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div style={{ marginTop:'1.2rem', maxWidth:'620px', textAlign:'center' }}>
+              <div style={{ fontFamily:"'Instrument Serif',serif", fontSize:'clamp(20px,2.2vw,26px)',
+                color: C.teal, marginBottom:'1.2rem',
+                opacity:0, animation:'fadeIn 500ms ease-out forwards', animationFillMode:'both' }}>
+                "Do the frequency of connections relate to archetypes?"
+              </div>
+              <div style={{ display:'flex', gap:'10px', justifyContent:'center', flexWrap:'wrap' }}>
+                {archetypeCards.map((a, i) => (
+                  <div key={i} style={{ ...glass, padding:'1rem', width:'160px', textAlign:'left',
+                    opacity:0, animation:`fadeIn 400ms ease-out ${i*100}ms forwards`, animationFillMode:'both' }}>
+                    <div style={{ fontSize:'22px', marginBottom:'6px' }}>{a.icon}</div>
+                    <div style={{ fontFamily:"'DM Sans',sans-serif", fontSize:'13px',
+                      fontWeight:'600', color: C.teal, marginBottom:'6px' }}>{a.name}</div>
+                    <div style={{ fontSize:'11px', color: C.grey, lineHeight:1.5 }}>{a.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div style={{ marginTop:'1.2rem', maxWidth:'600px', textAlign:'center' }}>
+              <div style={{ fontFamily:"'Instrument Serif',serif", fontSize:'clamp(22px,2.5vw,32px)',
+                color: C.white, lineHeight:1.4,
+                opacity:0, animation:'fadeIn 600ms ease-out forwards', animationFillMode:'both' }}>
+                "Who is missing from your team's map?<br/>
+                And whose voice would change everything<br/>
+                if it were heard?"
+              </div>
+            </div>
+          )}
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+/* --- SLIDE 21 -- PART 4: AUTHENTIC LEADERSHIP -------------- */
+const Slide21 = () => (
+  <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center',
+    position:'relative', padding:'3rem 3rem 3rem 4rem', overflow:'hidden' }}>
+    <div style={bgNumeral()}>04</div>
+    <div style={{ position:'absolute', top:'2rem', left:'2.5rem', ...label }}>
+      Part Four
+    </div>
+    <div style={{ maxWidth:'700px', position:'relative', zIndex:1 }}>
+      <div style={{ fontFamily:"'Instrument Serif', serif",
+        fontSize:'clamp(52px,5vw,72px)', color: C.white, lineHeight:1.05,
+        marginBottom:'0.5rem' }}>
+        Authentic Leadership
+      </div>
+      <div style={{ fontFamily:"'Instrument Serif', serif",
+        fontSize:'32px', color: C.grey, fontWeight:'300' }}>
+        &amp; Close
+      </div>
+    </div>
+  </div>
+);
+
+/* --- SLIDE 22 -- THE FIRST DAY QUESTION -------------------- */
+const Slide22 = ({ step }) => (
+  <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+    alignItems:'center', justifyContent:'center', padding:'3rem', textAlign:'center' }}>
+    <div style={{ fontFamily:"'Instrument Serif', serif",
+      fontSize:'clamp(32px,3.5vw,52px)', color: C.white, lineHeight:1.3,
+      maxWidth:'700px' }}>
+      How do we make a new team member<br/>feel psychologically safe?
+    </div>
+    {step >= 1 && (
+      <div style={{ marginTop:'2rem', fontFamily:"'DM Sans', sans-serif",
+        fontSize:'22px', color: C.teal, fontStyle:'italic',
+        opacity:0, animation:'fadeIn 500ms ease-out forwards' }}>
+        What does their first day look like?
+      </div>
+    )}
+  </div>
+);
+
+/* --- SLIDE 23 -- THE FIVE WELCOME COMMITMENTS -------------- */
+const commitments = [
+  {
+    quote:'"You are welcome here."',
+    sub:'Welcome them genuinely.',
+  },
+  {
+    plain:'Set clear roles and expectations immediately.',
+    sub:'No ambiguity on day one.',
+    bold:true,
+  },
+  {
+    quote:'"If things go well, thank you."',
+    sub:'Commit to gratitude.',
+  },
+  {
+    quote:'"If things don\'t go well, we will learn."',
+    sub:'Commit to learning, not blame.',
+  },
+  {
+    quote:'"I\'d love you to look back and see value in being here."',
+    sub:'Express genuine hope.',
+  },
+];
+
+const Slide23 = ({ step }) => (
+  <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center',
+    justifyContent:'center', padding:'3rem' }}>
+    <div style={{ maxWidth:'720px', width:'100%' }}>
+      {commitments.slice(0, step + 1).map((c, i) => (
+        <div key={i} style={{ marginBottom:'1.4rem', opacity:0,
+          animation:`fadeIn 500ms ease-out ${i === step ? 0 : 0}ms forwards`,
+          animationFillMode:'both' }}>
+          {c.quote ? (
+            <div style={{ fontFamily:"'Instrument Serif', serif",
+              fontSize:'clamp(20px,2.2vw,28px)', color: C.teal, lineHeight:1.4 }}>
+              {c.quote}
+            </div>
+          ) : (
+            <div style={{ fontFamily:"'Instrument Serif', serif",
+              fontSize:'clamp(20px,2.2vw,28px)',
+              color: C.white, lineHeight:1.4 }}>
+              {c.plain}
+            </div>
+          )}
+          <div style={{ fontFamily:"'DM Sans', sans-serif", fontSize:'15px',
+            color:'rgba(156,163,175,0.7)', marginTop:'0.3rem' }}>
+            {c.sub}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+/* --- SLIDE 24 -- THREE CORE MESSAGES ----------------------- */
+const messages = [
+  { text: 'Set the tone while being decisive.', highlight: null },
+  { text: 'Leadership is not a point event.',  highlight: null },
+  { text: ['Be ', 'yourself', ', without being a problem.'], highlight: 1 },
+];
+
+const Slide24 = ({ step }) => {
+  const [msgVisible, setMsgVisible] = useState(true);
+  const prevStep = useRef(step);
+
+  useEffect(() => {
+    if (prevStep.current !== step) {
+      setMsgVisible(false);
+      const t = setTimeout(() => { setMsgVisible(true); }, 220);
+      prevStep.current = step;
+      return () => clearTimeout(t);
+    }
+  }, [step]);
+
+  const msg = messages[step];
+  const isLast = step === 2;
+
+  return (
+    <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center',
+      justifyContent:'center', padding:'3rem' }}>
+      <div style={{
+        opacity: msgVisible ? 1 : 0,
+        transform: msgVisible ? 'translateY(0)' : 'translateY(12px)',
+        transition: msgVisible
+          ? 'opacity 400ms ease-out, transform 400ms ease-out'
+          : 'opacity 200ms ease-out, transform 200ms ease-out',
+        maxWidth:'720px', textAlign:'center',
+      }}>
+        {Array.isArray(msg.text) ? (
+          <div style={{ fontFamily:"'Instrument Serif', serif",
+            fontSize: isLast ? 'clamp(44px,5.5vw,70px)' : 'clamp(40px,5vw,64px)',
+            lineHeight:1.25, color: C.white }}>
+            {msg.text[0]}
+            <span style={{ color: C.teal }}>{msg.text[1]}</span>
+            {msg.text[2]}
+          </div>
+        ) : (
+          <div style={{ fontFamily:"'Instrument Serif', serif",
+            fontSize:'clamp(40px,5vw,64px)', color: C.white, lineHeight:1.25 }}>
+            {msg.text}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/* --- SLIDE 25 -- THE FIRST 48 HOURS ----------------------- */
+const Slide25 = () => (
+  <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+    padding:'1.8rem 2.5rem', overflow:'hidden' }}>
+    <div style={{ ...label, marginBottom:'0.6rem' }}>Commitment</div>
+    <div style={{ fontFamily:"'Instrument Serif', serif", fontSize:'40px',
+      color: C.white, marginBottom:'1.5rem' }}>
+      The First 48 Hours
+    </div>
+    <div className="three-cards" style={{ display:'flex', gap:'1.2rem',
+      flex:1, overflow:'hidden' }}>
+      {[
+        { num:'01', title:'One behaviour I will start',
+          desc:'from the five micro-behaviours' },
+        { num:'02', title:'One conversation I will have',
+          desc:'with a specific person, about a specific topic' },
+        { num:'03', title:'One thing I will stop doing',
+          desc:'that currently shuts people down' },
+      ].map(card => (
+        <div key={card.num} style={{ ...glass, flex:1, display:'flex',
+          flexDirection:'column', justifyContent:'center' }}>
+          <div style={{ fontFamily:"'Instrument Serif', serif", fontSize:'52px',
+            color: C.teal, lineHeight:1, marginBottom:'0.8rem' }}>
+            {card.num}
+          </div>
+          <div style={{ fontFamily:"'DM Sans', sans-serif", fontSize:'18px',
+            fontWeight:'600', color: C.white, marginBottom:'0.5rem' }}>
+            {card.title}
+          </div>
+          <div style={{ fontSize:'15px', color:'rgba(255,255,255,0.55)',
+            lineHeight:1.5 }}>
+            {card.desc}
+          </div>
+        </div>
+      ))}
+    </div>
+    <div style={{ textAlign:'center', fontSize:'16px', color: C.grey,
+      marginTop:'1.2rem' }}>
+      Share with a partner. Exchange contacts. Check in after two weeks.
+    </div>
+  </div>
+);
+
+/* --- SLIDE 26 -- FINAL CARD -------------------------------- */
+const Slide26 = () => (
+  <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column',
+    alignItems:'center', justifyContent:'center', position:'relative',
+    padding:'3rem' }}>
+    <div style={{ textAlign:'center' }}>
+      <div style={{ fontFamily:"'Instrument Serif', serif",
+        fontSize:'clamp(52px,5vw,72px)', lineHeight:1.1 }}>
+        <div style={{ color: C.white }}>From Psychological Safety</div>
+        <div style={{ color: C.teal }}>to Authentic Leadership</div>
+      </div>
+      <hr style={{ border:'none', borderTop:`1px solid rgba(255,255,255,0.2)`,
+        width:'300px', margin:'1.8rem auto' }} />
+      <div style={{ fontFamily:"'DM Sans', sans-serif", fontSize:'16px',
+        color:'rgba(156,163,175,0.7)' }}>
+        Thank you.
+      </div>
+    </div>
+    <div style={{ position:'absolute', bottom:'2rem', left:'50%',
+      transform:'translateX(-50%)', fontSize:'12px',
+      color:'rgba(156,163,175,0.6)', whiteSpace:'nowrap' }}>
+      Dr Jonathan Rhodes, University of Plymouth
+    </div>
+  </div>
+);
+
+/* --- SLIDE REGISTRY ---------------------------------------- */
+const SLIDES = [
+  { steps: 0 },  // 0  Title
+  { steps: 2 },  // 1  Word cloud
+  { steps: 0 },  // 2  Part 1
+  { steps: 3 },  // 3  Quadrant
+  { steps: 0 },  // 4  Case Studies
+  { steps: 0 },  // 5  Part 2
+  { steps: 0 },  // 6  Five Behaviours
+  { steps: 1 },  // 7  Leadership Lesson
+  { steps: 0 },  // 8  Part 3 Title
+  { steps: 1 },  // 9  Trustworthy Leader
+  { steps: 1 },  // 10 Distrusting Leader
+  { steps: 2 },  // 11 Sound Like          NEW
+  { steps: 1 },  // 12 Ingredients         NEW
+  { steps: 2 },  // 13 Thriving Model      NEW
+  { steps: 1 },  // 14 Thriving Equation   NEW
+  { steps: 2 },  // 15 Missing Link        NEW
+  { steps: 0 },  // 16 Scenario 1          NEW
+  { steps: 0 },  // 17 Scenario 2          NEW
+  { steps: 0 },  // 18 Pentland Research
+  { steps: 0 },  // 19 Energy/Engagement/Exploration
+  { steps: 3 },  // 20 Team Map (enhanced prompts)
+  { steps: 0 },  // 21 Part 4
+  { steps: 1 },  // 22 First Day Question
+  { steps: 4 },  // 23 Five Welcome Commitments
+  { steps: 2 },  // 24 Three Core Messages
+  { steps: 0 },  // 25 First 48 Hours
+  { steps: 0 },  // 26 Final Card
+];
+
+/* --- APP --------------------------------------------------- */
+const App = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [step, setStep]                 = useState(0);
+  const [visible, setVisible]           = useState(true);
+  const [showAbout, setShowAbout]       = useState(false);
+
+  // Team map state (shared, persisted across navigation)
+  const [teamSize, setTeamSize]             = useState(6);
+  const [teamMembers, setTeamMembers]       = useState(
+    Array.from({length:6},(_,i)=>({name:String.fromCharCode(65+i),freq:2}))
+  );
+  const [mapGenerated, setMapGenerated]     = useState(false);
+
+  const goToSlide = useCallback((idx, newStep = 0) => {
+    setVisible(false);
+    setTimeout(() => {
+      setCurrentSlide(idx);
+      setStep(newStep);
+      setVisible(true);
+    }, 300);
+  }, []);
+
+  const advance = useCallback(() => {
+    const maxSteps = SLIDES[currentSlide].steps;
+    if (step < maxSteps) {
+      setStep(s => s + 1);
+    } else if (currentSlide < SLIDES.length - 1) {
+      goToSlide(currentSlide + 1, 0);
+    }
+  }, [currentSlide, step, goToSlide]);
+
+  const goBack = useCallback(() => {
+    if (step > 0) {
+      setStep(s => s - 1);
+    } else if (currentSlide > 0) {
+      goToSlide(currentSlide - 1, SLIDES[currentSlide - 1].steps);
+    }
+  }, [currentSlide, step, goToSlide]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (showAbout) {
+        if (e.key === 'Escape') setShowAbout(false);
+        return;
+      }
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); advance(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goBack(); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [advance, goBack, showAbout]);
+
+  const generateHandout = () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const W = 210, H = 297;
+    const margin = 20;
+    const contentW = W - margin * 2;
+
+    const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    // Helper: ruled lines
+    const ruledLines = (startY, count, d) => {
+      d.setDrawColor(200, 200, 200);
+      d.setLineWidth(0.3);
+      for (let i = 0; i < count; i++) {
+        const y = startY + i * 8;
+        if (y < H - margin) d.line(margin, y, W - margin, y);
+      }
+      return startY + count * 8;
+    };
+
+    // Helper: section header
+    const sectionHeader = (text, y, d) => {
+      d.setFont('helvetica', 'bold');
+      d.setFontSize(14);
+      d.setTextColor(10, 15, 28);
+      d.text(text, margin, y);
+      d.setDrawColor(0, 137, 123);
+      d.setLineWidth(1);
+      d.line(margin, y + 3, W - margin, y + 3);
+      return y + 12;
+    };
+
+    // PAGE 1 -- Cover
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(10, 15, 28);
+    doc.text('FROM PSYCHOLOGICAL SAFETY TO', margin, 50);
+    doc.setTextColor(0, 137, 123);
+    doc.text('AUTHENTIC LEADERSHIP', margin, 62);
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.5);
+    doc.line(margin, 68, W - margin, 68);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Workshop Handout', margin, 76);
+
+    doc.setFontSize(11);
+    doc.setTextColor(51, 51, 51);
+    const intro = doc.splitTextToSize(
+      'This handout accompanies the facilitated workshop experience. It contains reflection prompts, frameworks, and space for your thinking. There are no answers here, only questions worth sitting with.',
+      contentW
+    );
+    doc.text(intro, margin, 110);
+
+    doc.setFontSize(11);
+    doc.setTextColor(100, 100, 100);
+    doc.text('Dr Jonathan Rhodes', margin, H - 30);
+    doc.text('University of Plymouth', margin, H - 25);
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, H - 18, W - margin, H - 18);
+    doc.setFontSize(9);
+    doc.text(today, margin, H - 13);
+
+    // PAGE 2 -- The Silence Problem
+    doc.addPage();
+    let y = margin + 5;
+    y = sectionHeader('01 -- THE SILENCE PROBLEM', y, doc);
+    y += 8;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(10, 15, 28);
+    const p1 = doc.splitTextToSize('Think of a time at work when you had something important to say but chose not to. What stopped you?', contentW);
+    doc.text(p1, margin, y);
+    y += p1.length * 6 + 6;
+    y = ruledLines(y, 9, doc);
+    y += 10;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(10, 15, 28);
+    const p2 = doc.splitTextToSize('What is the cost, to your team and your organisation, when capable people choose silence?', contentW);
+    doc.text(p2, margin, y);
+    y += p2.length * 6 + 6;
+    ruledLines(y, 7, doc);
+
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text('-- ' + (doc.getNumberOfPages() - 1) + ' --', W / 2, H - 10, { align: 'center' });
+
+    // PAGE 3 -- Quadrant Framework
+    doc.addPage();
+    y = margin + 5;
+    y = sectionHeader('FRAMEWORK -- THE SILENCE QUADRANT', y, doc);
+    y += 6;
+
+    const qLeft = margin + 10;
+    const qTop = y;
+    const qW = contentW - 20;
+    const qH = 90;
+    const midX = qLeft + qW / 2;
+    const midY = qTop + qH / 2;
+
+    doc.setDrawColor(10, 15, 28);
+    doc.setLineWidth(0.5);
+    doc.rect(qLeft, qTop, qW, qH);
+    doc.line(midX, qTop, midX, qTop + qH);
+    doc.line(qLeft, midY, qLeft + qW, midY);
+
+    doc.setDrawColor(0, 137, 123);
+    doc.setLineWidth(1.5);
+    doc.rect(midX, qTop, qW / 2, qH / 2);
+    doc.setDrawColor(10, 15, 28);
+    doc.setLineWidth(0.5);
+
+    const qLabels = [
+      { x: qLeft + 4, y: qTop + 8, title: 'Comfortable Silence', desc: "People care but\ndon't speak." },
+      { x: midX + 4,  y: qTop + 8, title: 'Psychological Safety', desc: 'People care AND\nspeak up.' },
+      { x: qLeft + 4, y: midY + 8, title: 'Apathy',               desc: 'Neither care\nnor speak.' },
+      { x: midX + 4,  y: midY + 8, title: 'Aggressive Culture',   desc: 'Speak up to attack,\nnot to build.' },
+    ];
+    qLabels.forEach(({ x, y: qy, title, desc }) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(10, 15, 28);
+      doc.text(title, x, qy);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text(desc, x, qy + 5);
+    });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text('NOT SPEAKING UP                                          SPEAKING UP', qLeft, qTop + qH + 6);
+    doc.setTextColor(0, 137, 123);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.text('TARGET', midX + 4, qTop + 6);
+
+    y = qTop + qH + 15;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(10, 15, 28);
+    const qp = doc.splitTextToSize('Where does your team sit today? Mark it on the quadrant. What would need to change to move toward the top-right?', contentW);
+    doc.text(qp, margin, y);
+    y += qp.length * 6 + 6;
+    ruledLines(y, 5, doc);
+
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text('-- ' + (doc.getNumberOfPages() - 1) + ' --', W / 2, H - 10, { align: 'center' });
+
+    // PAGE 4 -- Five Behaviours
+    doc.addPage();
+    y = margin + 5;
+    y = sectionHeader("02 -- THE LEADER'S TOOLKIT", y, doc);
+    y += 6;
+
+    const bList = [
+      ['1. Ask the First Question', 'Before stating a position, ask a genuine question.'],
+      ['2. Admit Uncertainty', '"I\'m not sure about this" gives permission for others to be uncertain too.'],
+      ['3. Acknowledge Mistakes', '"I got that wrong" normalises error as learning.'],
+      ['4. Invite Specific Contributions', 'Not "any thoughts?" but "Sarah, what are we missing?"'],
+      ['5. Challenge Respectfully', '"I see it differently because..." then "Help me understand your thinking."'],
+    ];
+    bList.forEach(([title, desc]) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(10, 15, 28);
+      doc.text(title, margin, y);
+      y += 6;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(51, 51, 51);
+      const wrapped = doc.splitTextToSize(desc, contentW - 10);
+      doc.text(wrapped, margin + 5, y);
+      y += wrapped.length * 5 + 6;
+    });
+
+    y += 6;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(10, 15, 28);
+    const bq = doc.splitTextToSize('Which of these five do you already do well? Which one would make the biggest difference if you started tomorrow?', contentW);
+    doc.text(bq, margin, y);
+    y += bq.length * 6 + 6;
+    ruledLines(y, 5, doc);
+
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text('-- ' + (doc.getNumberOfPages() - 1) + ' --', W / 2, H - 10, { align: 'center' });
+
+    // PAGE 5 -- Trust Reflection
+    doc.addPage();
+    y = margin + 5;
+    y = sectionHeader('03 -- TRUST', y, doc);
+    y += 8;
+
+    [
+      ['List the qualities you value in a leader you trust.', 6],
+      ["Now list what you see in a leader you don't trust.", 6],
+      ["What is one thing you could do this week to increase your team's trust in you?", 4],
+    ].forEach(([prompt, lines]) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(10, 15, 28);
+      const wrapped = doc.splitTextToSize(prompt, contentW);
+      doc.text(wrapped, margin, y);
+      y += wrapped.length * 6 + 5;
+      y = ruledLines(y, lines, doc);
+      y += 10;
+    });
+
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text('-- ' + (doc.getNumberOfPages() - 1) + ' --', W / 2, H - 10, { align: 'center' });
+
+    // PAGE 6 -- Ingredients of a Thriving Team
+    doc.addPage();
+    y = margin + 5;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(10, 15, 28);
+    doc.text('03 -- THRIVING CULTURES', margin, y);
+    doc.setDrawColor(0, 137, 123);
+    doc.setLineWidth(1);
+    doc.line(margin, y + 3, W - margin, y + 3);
+    y += 16;
+
+    const boxW = 50, boxH = 20, boxY = y;
+    const boxPositions = [margin, margin + boxW + 8, margin + (boxW + 8) * 2];
+    const boxLabels = ['Trust & Respect', 'Openness', 'Understanding'];
+    boxPositions.forEach((bx, bi) => {
+      doc.setDrawColor(0, 137, 123);
+      doc.setLineWidth(0.8);
+      doc.roundedRect(bx, boxY, boxW, boxH, 3, 3, 'S');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(0, 137, 123);
+      doc.text(boxLabels[bi], bx + boxW/2, boxY + boxH/2 + 1, { align: 'center' });
+    });
+
+    const arrowStartX = margin + (boxW * 3 + 16) / 2;
+    const arrowStartY = boxY + boxH + 2;
+    const arrowEndY = arrowStartY + 12;
+    doc.setDrawColor(150, 150, 150);
+    doc.setLineWidth(0.5);
+    doc.line(arrowStartX, arrowStartY, arrowStartX, arrowEndY);
+    doc.line(arrowStartX - 3, arrowEndY - 4, arrowStartX, arrowEndY);
+    doc.line(arrowStartX + 3, arrowEndY - 4, arrowStartX, arrowEndY);
+
+    const centralX = margin + 20;
+    const centralY = arrowEndY + 2;
+    const centralW = (boxW * 3 + 16);
+    const centralH = 18;
+    doc.setFillColor(0, 137, 123);
+    doc.roundedRect(centralX, centralY, centralW - 40, centralH, 3, 3, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(255, 255, 255);
+    doc.text('Vitality + Learning = THRIVING', centralX + (centralW - 40)/2, centralY + centralH/2 + 1, { align: 'center' });
+
+    y = centralY + centralH + 12;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(10, 15, 28);
+    doc.text('Rate your team 1-10 on each enabling condition:', margin, y);
+    y += 10;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(51, 51, 51);
+    ['Trust & Respect:', 'Openness:', 'Understanding:'].forEach(lbl => {
+      doc.text(lbl, margin, y);
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      doc.line(margin + 45, y + 1, margin + 80, y + 1);
+      doc.text('/ 10', margin + 82, y);
+      y += 10;
+    });
+
+    y += 6;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(10, 15, 28);
+    const gapQ = doc.splitTextToSize('Where is the biggest gap? What is one thing you could do this month to close it?', contentW);
+    doc.text(gapQ, margin, y);
+    y += gapQ.length * 6 + 5;
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.3);
+    for (let i = 0; i < 6; i++) { const ly = y + i * 8; if (ly < H - margin) doc.line(margin, ly, W - margin, ly); }
+
+    doc.setFontSize(9);
+    doc.setTextColor(150, 150, 150);
+    doc.text('-- ' + (doc.getNumberOfPages() - 1) + ' --', W / 2, H - 10, { align: 'center' });
+
+    // PAGE 7 -- Scenario Problem-Solving
+    doc.addPage();
+    y = margin + 5;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(10, 15, 28);
+    doc.text('SCENARIOS -- WHAT WOULD YOU DO?', margin, y);
+    doc.setDrawColor(0, 137, 123);
+    doc.setLineWidth(1);
+    doc.line(margin, y + 3, W - margin, y + 3);
+    y += 16;
+
+    const scenariosData = [
+      {
+        title: 'THE RESEARCH INSTITUTE',
+        body: "Five specialist groups. Excellent in isolation. Failing at collaboration. A junior researcher says: \"I didn't know who to ask, and I didn't think anyone outside my group would care.\"\n\nWhat would you do first? What thriving condition (Trust, Openness, Understanding) is most missing here?",
+      },
+      {
+        title: 'THE SENIOR LEADERSHIP TEAM',
+        body: "Eight members. Monday meetings. Packed agendas. Efficient. Polite. But: \"We share a meeting, but we don't share a mission.\"\n\nWhat would you do first? Which thriving condition would you target?",
+      },
+    ];
+
+    scenariosData.forEach(sc => {
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.5);
+      doc.setDrawColor(0, 137, 123);
+      doc.line(margin, y, margin + 2, y);
+      doc.setDrawColor(200, 200, 200);
+      doc.rect(margin, y, contentW, 80);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(10, 15, 28);
+      doc.text(sc.title, margin + 6, y + 10);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(51, 51, 51);
+      const bodyLines = doc.splitTextToSize(sc.body, contentW - 12);
+      doc.text(bodyLines, margin + 6, y + 18);
+      y += 88;
+
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      for (let i = 0; i < 6; i++) { const ly = y + i * 8; if (ly < H - margin) doc.line(margin, ly, W - margin, ly); }
+      y += 58;
+    });
+
+    doc.setFontSize(9);
+    doc.setTextColor(150, 150, 150);
+    doc.text('-- ' + (doc.getNumberOfPages() - 1) + ' --', W / 2, H - 10, { align: 'center' });
+
+    // PAGE 8 -- Sociogram Template
+    doc.addPage();
+    y = margin + 5;
+    y = sectionHeader('03 -- MAP YOUR TEAM', y, doc);
+    y += 6;
+
+    const instructions = [
+      "Map your team's communication patterns.",
+      '',
+      '> Write team members\' names or initials next to each node.',
+      '> Draw THICK lines between people who communicate frequently.',
+      '> Draw THIN lines between people who communicate rarely.',
+      '> Circle anyone who is isolated or peripheral.',
+      '> Put a star next to anyone who connects your team to other teams.',
+    ];
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(51, 51, 51);
+    instructions.forEach(line => { doc.text(line, margin, y); y += 6; });
+    y += 4;
+
+    const cx2 = W / 2, cy2 = y + 52, r2 = 45;
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.3);
+    doc.circle(cx2, cy2, r2, 'S');
+
+    const nodeLabels = ['A','B','C','D','E','F','G','H'];
+    const nodePoints = nodeLabels.map((lbl, i) => {
+      const angle = (2 * Math.PI * i / nodeLabels.length) - Math.PI / 2;
+      return { x: cx2 + r2 * Math.cos(angle), y: cy2 + r2 * Math.sin(angle), lbl };
+    });
+
+    doc.setDrawColor(220, 220, 220);
+    doc.setLineWidth(0.2);
+    for (let a = 0; a < nodePoints.length; a++) {
+      for (let b = a + 1; b < nodePoints.length; b++) {
+        doc.line(nodePoints[a].x, nodePoints[a].y, nodePoints[b].x, nodePoints[b].y);
+      }
+    }
+
+    nodePoints.forEach(({ x, y: ny, lbl }, i) => {
+      const isYou = i === 2;
+      const nr = isYou ? 5 : 3.5;
+      if (isYou) {
+        doc.setFillColor(0, 137, 123);
+      } else {
+        doc.setFillColor(200, 200, 200);
+      }
+      doc.circle(x, ny, nr, 'F');
+      doc.setFont('helvetica', isYou ? 'bold' : 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(10, 15, 28);
+      const offset = 7;
+      const angle = (2 * Math.PI * i / nodePoints.length) - Math.PI / 2;
+      doc.text(isYou ? 'You' : lbl, x + offset * Math.cos(angle), ny + offset * Math.sin(angle), { align: 'center' });
+    });
+
+    y = cy2 + r2 + 15;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(10, 15, 28);
+    ['Who dominates the airtime?', 'Who is invisible?', 'What would this map look like under pressure?'].forEach(q => {
+      doc.text(q, margin, y); y += 6;
+    });
+    y += 4;
+    ruledLines(y, 4, doc);
+
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text('-- ' + (doc.getNumberOfPages() - 1) + ' --', W / 2, H - 10, { align: 'center' });
+
+    // PAGE 7 -- Pentland Reference
+    doc.addPage();
+    y = margin + 5;
+    y = sectionHeader("PENTLAND'S THREE DIMENSIONS", y, doc);
+    y += 6;
+
+    const diagW = 50, diagH = 45;
+    const diagY = y;
+    const diagPositions = [margin, margin + diagW + 10, margin + (diagW + 10) * 2];
+    const diagTitles = ['ENERGY', 'ENGAGEMENT', 'EXPLORATION'];
+    const diagDescs = [
+      'Who contributes\nto the team?',
+      'How members\ncommunicate.',
+      'Connections\nbeyond the team.',
+    ];
+
+    diagPositions.forEach((dx, di) => {
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      doc.rect(dx, diagY, diagW, diagH);
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.setTextColor(0, 137, 123);
+      doc.text(diagTitles[di], dx + diagW / 2, diagY + 5, { align: 'center' });
+
+      if (di === 0) {
+        const ecx = dx + diagW / 2, ecy = diagY + diagH / 2 + 2;
+        for (let ni = 0; ni < 6; ni++) {
+          const a = (2 * Math.PI * ni / 6) - Math.PI / 2;
+          const nx = ecx + 14 * Math.cos(a), nny = ecy + 14 * Math.sin(a);
+          doc.setLineWidth(ni < 3 ? 1.2 : 0.4);
+          if (ni < 3) { doc.setDrawColor(0, 137, 123); } else { doc.setDrawColor(200, 200, 200); }
+          doc.line(ecx, ecy, nx, nny);
+          if (ni < 3) { doc.setFillColor(0, 137, 123); } else { doc.setFillColor(200, 200, 200); }
+          doc.circle(nx, nny, ni < 3 ? 2.5 : 1.5, 'F');
+        }
+        doc.setFillColor(0, 137, 123);
+        doc.circle(ecx, ecy, 2, 'F');
+      } else if (di === 1) {
+        const npts = [0,1,2,3,4,5].map(ni => {
+          const a = (2 * Math.PI * ni / 6) - Math.PI / 2;
+          return { x: dx + diagW/2 + 14*Math.cos(a), y: diagY + diagH/2 + 2 + 14*Math.sin(a) };
+        });
+        for (let a = 0; a < npts.length; a++) {
+          for (let b = a+1; b < npts.length; b++) {
+            const thick = (a < 3 && b < 3);
+            doc.setLineWidth(thick ? 1.2 : 0.3);
+            if (thick) { doc.setDrawColor(0, 137, 123); } else { doc.setDrawColor(200, 200, 200); }
+            doc.line(npts[a].x, npts[a].y, npts[b].x, npts[b].y);
+          }
+        }
+        npts.forEach((pt, ni) => {
+          if (ni < 3) { doc.setFillColor(0, 137, 123); } else { doc.setFillColor(200, 200, 200); }
+          doc.circle(pt.x, pt.y, ni < 3 ? 2.5 : 1.5, 'F');
+        });
+      } else {
+        const bars = [['A',30,10],['B',20,20],['C',15,25],['D',25,8]];
+        const barW = 6, barSpacing = 10;
+        bars.forEach(([lbl, internal, external], bi) => {
+          const bx = dx + 6 + bi * barSpacing;
+          const scale = 0.5;
+          const intH = internal * scale, extH = external * scale;
+          const baseY = diagY + diagH - 6;
+          doc.setFillColor(10, 15, 28);
+          doc.rect(bx, baseY - intH, barW, intH, 'F');
+          doc.setFillColor(0, 137, 123);
+          doc.rect(bx, baseY - intH - extH, barW, extH, 'F');
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(6);
+          doc.setTextColor(100, 100, 100);
+          doc.text(lbl, bx + barW/2, baseY + 3, { align: 'center' });
+        });
+      }
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(100, 100, 100);
+      doc.text(diagDescs[di], dx + diagW/2, diagY + diagH + 5, { align: 'center' });
+    });
+
+    y = diagY + diagH + 18;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(10, 15, 28);
+    doc.text('Five indicators of successful teams (Pentland, 2012):', margin, y);
+    y += 8;
+
+    const pentlandPoints = [
+      '1. Everyone talks and listens in roughly equal measure.',
+      '2. Conversations are energetic.',
+      '3. Members connect directly with each other, not just the leader.',
+      '4. Back-channel and side conversations happen within the team.',
+      '5. Members periodically explore outside and bring information back.',
+    ];
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(51, 51, 51);
+    pentlandPoints.forEach(pt => { doc.text(pt, margin, y); y += 7; });
+
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text('-- ' + (doc.getNumberOfPages() - 1) + ' --', W / 2, H - 10, { align: 'center' });
+
+    // PAGE 8 -- Authentic Leadership
+    doc.addPage();
+    y = margin + 5;
+    y = sectionHeader('04 -- AUTHENTIC LEADERSHIP', y, doc);
+    y += 6;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(10, 15, 28);
+    doc.text('When a new person joins your team:', margin, y);
+    y += 10;
+
+    const cList = [
+      ['"You are welcome here."', 'Welcome them genuinely.'],
+      ['Set clear roles and expectations immediately.', 'No ambiguity on day one.'],
+      ['"If things go well, thank you."', 'Commit to gratitude.'],
+      ['"If things don\'t go well, we will learn."', 'Commit to learning, not blame.'],
+      ['"I\'d love you to look back and see value in being here."', 'Express genuine hope.'],
+    ];
+    cList.forEach(([title, desc], ci) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(0, 137, 123);
+      doc.text(`${ci + 1}. ${title}`, margin, y);
+      y += 6;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(51, 51, 51);
+      doc.text(desc, margin + 5, y);
+      y += 9;
+    });
+
+    y += 6;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(10, 15, 28);
+    const alq = doc.splitTextToSize('Think about the last person who joined your team. How closely did their first day match these five commitments? What will you do differently next time?', contentW);
+    doc.text(alq, margin, y);
+    y += alq.length * 6 + 6;
+    ruledLines(y, 5, doc);
+
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text('-- ' + (doc.getNumberOfPages() - 1) + ' --', W / 2, H - 10, { align: 'center' });
+
+    // PAGE 9 -- Commitment Card
+    doc.addPage();
+    y = margin + 5;
+    y = sectionHeader('YOUR COMMITMENT -- THE FIRST 48 HOURS', y, doc);
+    y += 8;
+
+    const boxes = [
+      ['ONE BEHAVIOUR I WILL START', '(from the five micro-behaviours)'],
+      ['ONE CONVERSATION I WILL HAVE', '(with a specific person, about a specific topic)'],
+      ['ONE THING I WILL STOP DOING', '(that currently shuts people down)'],
+    ];
+    boxes.forEach(([title, sub]) => {
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.5);
+      doc.rect(margin, y, contentW, 55);
+      doc.setDrawColor(0, 137, 123);
+      doc.setLineWidth(1.5);
+      doc.line(margin, y, margin, y + 55);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(10, 15, 28);
+      doc.text(title, margin + 8, y + 10);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text(sub, margin + 8, y + 17);
+      y += 63;
+    });
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(51, 51, 51);
+    doc.text('Share with a partner. Exchange contacts. Check in after two weeks.', W / 2, y + 6, { align: 'center' });
+
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text('-- ' + (doc.getNumberOfPages() - 1) + ' --', W / 2, H - 10, { align: 'center' });
+
+    // PAGE 10 -- Three Core Messages
+    doc.addPage();
+    y = 70;
+
+    const msgs = [
+      { text: 'Set the tone while being decisive.', dark: true },
+      { text: 'Leadership is not a point event.', dark: true },
+      { text: 'Be yourself, without being a problem.', dark: false },
+    ];
+    msgs.forEach(({ text, dark }) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      if (dark) { doc.setTextColor(10, 15, 28); } else { doc.setTextColor(0, 137, 123); }
+      doc.text(text, W / 2, y, { align: 'center' });
+      y += 28;
+    });
+
+    y += 20;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.text('"From Psychological Safety to Authentic Leadership"', W / 2, y, { align: 'center' });
+    y += 8;
+    doc.text('Dr Jonathan Rhodes, University of Plymouth', W / 2, y, { align: 'center' });
+
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, H - 22, W - margin, H - 22);
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text("Research references are available in the workshop presentation's About section, or by contacting the facilitator.", W / 2, H - 15, { align: 'center' });
+
+    doc.save('FPSTAL_Workshop_Handout.pdf');
+  };
+
+  const progress = ((currentSlide + step / Math.max(SLIDES[currentSlide].steps, 1)) / (SLIDES.length - 1)) * 100;
+
+  const slideProps = {
+    step,
+    teamSize, setTeamSize,
+    teamMembers, setTeamMembers,
+    mapGenerated, setMapGenerated,
+  };
+
+  const renderSlide = () => {
+    switch (currentSlide) {
+      case  0: return <Slide0 setShowAbout={setShowAbout} generateHandout={generateHandout} />;
+      case  1: return <Slide1 {...slideProps} />;
+      case  2: return <Slide2 />;
+      case  3: return <Slide3 {...slideProps} />;
+      case  4: return <Slide4 />;
+      case  5: return <Slide5 />;
+      case  6: return <Slide6 />;
+      case  7: return <Slide7 {...slideProps} />;
+      case  8: return <Slide8 />;
+      case  9: return <Slide9 {...slideProps} />;
+      case 10: return <Slide10 {...slideProps} />;
+      case 11: return <SlideSound {...slideProps} />;
+      case 12: return <SlideIngredients {...slideProps} />;
+      case 13: return <SlideThrivingModel {...slideProps} />;
+      case 14: return <SlideThrivingEquation {...slideProps} />;
+      case 15: return <SlideMissingLink {...slideProps} />;
+      case 16: return <SlideScenario1 />;
+      case 17: return <SlideScenario2 />;
+      case 18: return <Slide18 />;
+      case 19: return <Slide19 />;
+      case 20: return <Slide20 {...slideProps} teamSize={teamSize} setTeamSize={setTeamSize} teamMembers={teamMembers} setTeamMembers={setTeamMembers} mapGenerated={mapGenerated} setMapGenerated={setMapGenerated} />;
+      case 21: return <Slide21 />;
+      case 22: return <Slide22 {...slideProps} />;
+      case 23: return <Slide23 {...slideProps} />;
+      case 24: return <Slide24 {...slideProps} />;
+      case 25: return <Slide25 />;
+      case 26: return <Slide26 />;
+      default: return null;
+    }
+  };
+
+  return (
+    <div style={{ width:'100vw', height:'100vh', overflow:'hidden',
+      background: currentSlide === 10 ? C.cream : C.bg,
+      transition:'background 400ms ease',
+      position:'relative', display:'flex', flexDirection:'column' }}>
+
+      {/* Progress bar */}
+      <div style={{ position:'fixed', top:0, left:0, right:0, height:'2px',
+        background:'rgba(255,255,255,0.07)', zIndex:100 }}>
+        <div style={{ height:'100%', background: C.teal,
+          width:`${progress}%`, transition:'width 400ms ease-out' }} />
+      </div>
+
+      {/* Slide content */}
+      <div style={{
+        flex:1, overflow:'hidden', position:'relative',
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(20px)',
+        transition: visible
+          ? 'opacity 500ms ease-out, transform 500ms ease-out'
+          : 'opacity 300ms ease-out, transform 300ms ease-out',
+      }}>
+        {renderSlide()}
+      </div>
+
+      {/* Slide counter -- bottom left */}
+      <div style={{
+        position:'fixed', bottom:'1.5rem', left:'2rem',
+        fontFamily:"'DM Sans', sans-serif",
+        fontSize:'12px', fontWeight:'400', letterSpacing:'0.12em',
+        color: currentSlide === 10 ? 'rgba(26,26,46,0.5)' : 'rgba(156,163,175,0.5)',
+        userSelect:'none', zIndex:100,
+      }}>
+        {String(currentSlide + 1).padStart(2,'0')} / {String(SLIDES.length).padStart(2,'0')}
+      </div>
+
+      {/* Navigation arrows -- bottom right */}
+      <div style={{ position:'fixed', bottom:'1.2rem', right:'1.5rem',
+        display:'flex', gap:'0.5rem', zIndex:100 }}>
+        {[
+          { label:'←', action: goBack,  disabled: currentSlide === 0 && step === 0 },
+          { label:'→', action: advance, disabled: currentSlide === SLIDES.length - 1 && step === SLIDES[currentSlide].steps },
+        ].map(btn => (
+          <button key={btn.label} onClick={btn.action}
+            disabled={btn.disabled}
+            style={{
+              width:'48px', height:'48px',
+              background:'rgba(255,255,255,0.06)',
+              backdropFilter:'blur(20px)',
+              WebkitBackdropFilter:'blur(20px)',
+              border:'1px solid rgba(255,255,255,0.12)',
+              borderRadius:'12px',
+              color: btn.disabled
+                ? 'rgba(255,255,255,0.2)'
+                : (currentSlide === 10 ? C.darkText : C.white),
+              fontSize:'18px', cursor: btn.disabled ? 'default' : 'pointer',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              transition:'background 200ms ease, border-color 200ms ease',
+              fontFamily:'DM Sans',
+            }}
+            onMouseEnter={e => { if (!btn.disabled) e.currentTarget.style.background='rgba(255,255,255,0.1)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background='rgba(255,255,255,0.06)'; }}>
+            {btn.label}
+          </button>
+        ))}
+      </div>
+
+      {/* About Panel overlay */}
+      {showAbout && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 1000,
+          background: 'rgba(10,15,28,0.97)',
+          backdropFilter: 'blur(30px)',
+          WebkitBackdropFilter: 'blur(30px)',
+          overflowY: 'auto',
+          animation: 'slideInRight 500ms ease-out',
+        }}>
+          {/* Close button */}
+          <button onClick={() => setShowAbout(false)} style={{
+            position: 'sticky', top: '2rem', float: 'right', marginRight: '2.5rem',
+            background: 'transparent', border: '1px solid rgba(255,255,255,0.2)',
+            borderRadius: '50%', width: '40px', height: '40px',
+            color: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontSize: '18px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 10, transition: 'border-color 200ms, color 200ms',
+          }}>&#x2715;</button>
+
+          {/* Content */}
+          <div style={{ maxWidth: '800px', margin: '0 auto', padding: '4rem 2rem 6rem' }}>
+            {/* About This Experience */}
+            <div style={{ marginBottom: '3rem' }}>
+              <div style={{ fontFamily: "'DM Sans'", fontSize: '11px', fontWeight: '500',
+                letterSpacing: '0.15em', textTransform: 'uppercase', color: '#00F0D0',
+                marginBottom: '1rem' }}>About This Experience</div>
+              <p style={{ fontSize: '18px', color: 'rgba(255,255,255,0.85)', lineHeight: 1.7 }}>
+                "From Psychological Safety to Authentic Leadership" is a facilitated workshop experience
+                designed for leadership teams. It draws on peer-reviewed research in organisational
+                psychology, team dynamics, and leadership science to create an evidence-based session
+                that moves from understanding why people stay silent, through the science of team
+                communication, to practical tools leaders can use immediately.
+              </p>
+              <div style={{ marginTop: '1.2rem', fontSize: '16px' }}>
+                <span style={{ color: '#00F0D0' }}>Dr Jonathan Rhodes</span>
+                <span style={{ color: 'rgba(255,255,255,0.5)' }}> &middot; </span>
+                <span style={{ color: '#00F0D0' }}>University of Plymouth</span>
+              </div>
+            </div>
+
+            <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', marginBottom: '3rem' }} />
+
+            {/* Research Foundations label */}
+            <div style={{ fontFamily: "'DM Sans'", fontSize: '11px', fontWeight: '500',
+              letterSpacing: '0.15em', textTransform: 'uppercase', color: '#00F0D0',
+              marginBottom: '2rem' }}>RESEARCH FOUNDATIONS</div>
+
+            {/* Research cards */}
+            {researchCards.map((card, i) => (
+              <div key={i} style={{
+                background: 'rgba(255,255,255,0.04)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderLeft: '4px solid #00F0D0',
+                borderRadius: '16px',
+                padding: '2rem',
+                marginBottom: '1.5rem',
+              }}>
+                <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: '24px', color: '#00F0D0', marginBottom: '4px' }}>
+                  {card.name}
+                </div>
+                <div style={{ fontSize: '13px', color: '#6B7280', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '1rem' }}>
+                  {card.role}
+                </div>
+                <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, marginBottom: '1.2rem' }}>
+                  {card.concept}
+                </p>
+                <div style={{ marginBottom: '1rem' }}>
+                  {card.works.map((w, j) => (
+                    <div key={j} style={{ fontSize: '14px', color: '#6B7280', fontStyle: 'italic', lineHeight: 1.6, marginBottom: '4px' }}
+                      dangerouslySetInnerHTML={{ __html: w }} />
+                  ))}
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                  {card.links.map((lnk, j) => (
+                    <a key={j} href={lnk.url} target="_blank" rel="noopener noreferrer"
+                      style={{ fontSize: '13px', color: '#00F0D0', textDecoration: 'none',
+                        display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      {lnk.label} &#x2197;
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '3rem 0 2.5rem' }} />
+
+            {/* About the Designer */}
+            <div style={{ marginBottom: '2.5rem' }}>
+              <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '11px', fontWeight: '500',
+                letterSpacing: '0.15em', textTransform: 'uppercase', color: '#00F0D0',
+                marginBottom: '1.2rem' }}>About the Designer</div>
+              <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: '26px', color: '#FFFFFF',
+                marginBottom: '0.5rem' }}>Dr Jon Rhodes</div>
+              <div style={{ fontSize: '13px', color: '#6B7280', letterSpacing: '0.08em',
+                textTransform: 'uppercase', marginBottom: '1.5rem' }}>
+                Performance Psychologist &amp; Co-developer, Functional Imagery Training
+              </div>
+              <p style={{ fontSize: '17px', color: 'rgba(255,255,255,0.8)', lineHeight: 1.75,
+                marginBottom: '1rem' }}>
+                Jon's work sits at the sharp end of human performance, supporting explorers, world-class
+                teams, military personnel, athletes and leaders to think, adapt and act under pressure.
+              </p>
+              <p style={{ fontSize: '17px', color: 'rgba(255,255,255,0.8)', lineHeight: 1.75 }}>
+                Through research, interviews, coaching and real-world testing, he designs practical
+                leadership tools that are evidence-led, interactive and built for use. His work turns
+                psychological science into experiences that help people imagine better futures, make
+                clearer decisions and move from insight to action.
+              </p>
+              <div style={{ marginTop: '1.2rem' }}>
+                <a href="https://www.plymouth.ac.uk/staff/jon-rhodes" target="_blank" rel="noopener noreferrer"
+                  style={{ fontSize: '13px', color: '#00F0D0', textDecoration: 'none',
+                    display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  Dr Jon Rhodes, University of Plymouth ↗
+                </a>
+              </div>
+            </div>
+
+            <p style={{ fontSize: '12px', color: '#4B5563', lineHeight: 1.6, marginTop: '2rem' }}>
+              All references are to peer-reviewed or institutionally published sources. For full texts, consult the referenced journals or institutional websites.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
