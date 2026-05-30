@@ -3734,68 +3734,137 @@ strong {
    DONUT CHART
    ============================================ */
 
-.donut-container {
-  position: relative;
+/* ── Archetype Wheel (SVG) ── */
+.archetype-wheel-wrap {
   width: 100%;
-  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
+}
+
+#archetype-wheel {
+  width: 100%;
+  max-width: 480px;
+}
+
+#archetype-wheel svg {
+  width: 100%;
+  height: auto;
   overflow: visible;
 }
 
-#donut-canvas,
+/* Detail panel */
+.archetype-detail-panel {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border: 1px solid rgba(10,10,10,0.08);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 4px 24px rgba(10,10,10,0.07);
+}
+
+.arch-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.arch-detail-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0A0A0A;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.arch-detail-role {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(10,10,10,0.38);
+  margin-top: 0.2rem;
+}
+
+.arch-detail-close {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: rgba(10,10,10,0.35);
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px 4px;
+  flex-shrink: 0;
+}
+.arch-detail-close:hover { color: #0A0A0A; }
+
+.arch-detail-summary {
+  font-size: 0.9rem;
+  color: rgba(10,10,10,0.72);
+  line-height: 1.7;
+  margin-bottom: 0.875rem;
+}
+
+.arch-detail-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #FF4D00;
+  margin-bottom: 0.4rem;
+}
+
+.arch-detail-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.arch-detail-list li {
+  font-size: 0.85rem;
+  color: rgba(10,10,10,0.65);
+  padding-left: 1rem;
+  position: relative;
+  line-height: 1.5;
+}
+
+.arch-detail-list li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: #FF4D00;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.arch-badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 20px;
+  vertical-align: middle;
+}
+.arch-badge.primary   { background: rgba(255,77,0,0.12); color: #FF4D00; }
+.arch-badge.secondary { background: rgba(255,139,71,0.12); color: #CC5500; }
+
+/* Keep team donut canvas working */
 #team-donut-canvas {
   width: 100%;
   height: auto;
   aspect-ratio: 1 / 1;
   cursor: pointer;
-}
-
-.donut-instruction {
-  font-size: 0.9rem;
-  color: var(--color-text-secondary);
-  text-align: center;
-  line-height: 1.5;
-  transition: opacity 0.3s ease;
-}
-
-.donut-instruction.hidden {
-  display: none;
-}
-
-.donut-tooltip {
-  position: absolute;
-  background: var(--color-primary);
-  color: var(--color-bg);
-  padding: 0.75rem 1rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  pointer-events: none;
-  z-index: 1000;
-  max-width: 260px;
-  line-height: 1.4;
-  white-space: normal;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.btn-back-to-wheel {
-  padding: 0.75rem 1.5rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  background: transparent;
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  margin-top: 1rem;
-}
-
-.btn-back-to-wheel:hover {
-  background: var(--color-primary);
-  color: var(--color-bg);
 }
 
 /* ============================================
@@ -8104,13 +8173,15 @@ body.exp2-active #view-exp2 { padding-top: 0; }
                   </div>
                 </div>
 
-                <!-- RIGHT: Interactive Donut -->
+                <!-- RIGHT: Interactive Archetype Wheel -->
                 <div class="results-right">
-                  <div class="donut-container">
-                    <canvas id="donut-canvas" width="400" height="400"></canvas>
-                    <div class="donut-instruction" id="donut-instruction">Click an archetype to explore its structure.</div>
+                  <div class="archetype-wheel-wrap">
+                    <div id="archetype-wheel"></div>
+                    <div id="archetype-detail-panel" class="archetype-detail-panel" style="display:none;"></div>
                   </div>
-                  <button class="btn-back-to-wheel" id="btn-back-to-wheel" style="display: none;">← Back to full wheel</button>
+                  <!-- kept for event listener compatibility -->
+                  <button id="btn-back-to-wheel" style="display:none;" aria-hidden="true"></button>
+                  <div class="donut-instruction" id="donut-instruction" style="display:none;"></div>
                 </div>
 
               </div>
@@ -10339,300 +10410,203 @@ function updateLockInButtonState() {
 
   </script>
   <script>
-  // donut.js
   // ============================================
-// DONUT CHART FUNCTIONALITY
-// ============================================
+  // ARCHETYPE WHEEL — SVG redesign
+  // ============================================
 
-let donutState = {
-  currentZoom: null, // null for full wheel, or archetype id for zoomed
-  canvas: null,
-  ctx: null,
-  animationProgress: 0,
-};
-
-let teamDonutState = {
-  canvas: null,
-  ctx: null,
-  animationProgress: 0,
-};
-
-// Initialize on document ready
-document.addEventListener('DOMContentLoaded', () => {
-  donutState.canvas = document.getElementById('donut-canvas');
-  if (donutState.canvas) {
-    donutState.ctx = donutState.canvas.getContext('2d');
-  }
-
-  teamDonutState.canvas = document.getElementById('team-donut-canvas');
-  if (teamDonutState.canvas) {
-    teamDonutState.ctx = teamDonutState.canvas.getContext('2d');
-  }
-});
-
-// ============================================
-// MAIN DONUT CHART (Results Page)
-// ============================================
-
-function initializeDonutChart() {
-  if (!donutState.canvas) return;
-
-  // Get canvas dimensions
-  const rect = donutState.canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-
-  donutState.canvas.width = rect.width * dpr;
-  donutState.canvas.height = rect.height * dpr;
-  donutState.ctx.setTransform(1, 0, 0, 1, 0, 0);
-  donutState.ctx.scale(dpr, dpr);
-
-  donutState.animationProgress = 0;
-  donutState.currentZoom = null;
-
-  // Reset instruction
-  document.getElementById('donut-instruction').textContent = 'Click an archetype to explore its structure.';
-  document.getElementById('donut-instruction').classList.remove('hidden');
-  document.getElementById('btn-back-to-wheel').style.display = 'none';
-
-  animateDonut();
-}
-
-function animateDonut() {
-  donutState.animationProgress += 0.02;
-  if (donutState.animationProgress > 1) donutState.animationProgress = 1;
-
-  drawDonut(donutState.animationProgress);
-
-  if (donutState.animationProgress < 1) {
-    requestAnimationFrame(animateDonut);
-  }
-}
-
-function drawDonut(progress = 1) {
-  const canvas = donutState.canvas;
-  const ctx = donutState.ctx;
-  const width = canvas.offsetWidth;
-  const height = canvas.offsetHeight;
-  const centerX = width / 2;
-  const centerY = height / 2;
-  const radius = Math.min(width, height) / 2 - 72;
-  const innerRadius = radius * 0.6;
-
-  // Clear canvas
-  ctx.clearRect(0, 0, width, height);
-
-  if (donutState.currentZoom === null) {
-    // Draw full wheel
-    drawFullWheel(ctx, centerX, centerY, radius, innerRadius, progress);
-  } else {
-    // Draw zoomed view
-    drawZoomedView(ctx, centerX, centerY, radius, innerRadius, progress);
-  }
-}
-
-function drawFullWheel(ctx, centerX, centerY, radius, innerRadius, progress) {
-  const archetypes = archetypesData.archetypes;
-  const sliceSize = (Math.PI * 2) / archetypes.length;
-  const colors = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
-    '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B195'
+  // Muted platform-toned palette for the 9 archetypes
+  const ARCH_COLORS = [
+    '#E07866', // Navigator
+    '#3DBBA5', // Guardian
+    '#4FAED4', // Synchroniser
+    '#F09465', // Anchor
+    '#72C9B0', // Connector
+    '#F5C842', // Energiser
+    '#9B7FCC', // Decision-Maker
+    '#60AEDD', // Explorer
+    '#F08E75', // Innovator
   ];
 
-  archetypes.forEach((archetype, index) => {
-    const startAngle = index * sliceSize - Math.PI / 2;
-    const endAngle = startAngle + sliceSize * progress;
-    const color = colors[index % colors.length];
+function initializeDonutChart() {
+  renderArchetypeWheel();
+}
 
-    // Draw slice
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-    ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
-    ctx.fillStyle = color;
-    ctx.fill();
+function resetToWheel() {
+  // Close detail panel if open
+  const panel = document.getElementById('archetype-detail-panel');
+  if (panel) panel.style.display = 'none';
+}
 
-    // Draw slice border
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+function renderArchetypeWheel() {
+  const container = document.getElementById('archetype-wheel');
+  if (!container) return;
 
-    // Draw label
-    if (progress > 0.7) {
-      const labelAngle = startAngle + sliceSize / 2;
-      const labelRadius = (radius + innerRadius) / 2;
-      const labelX = centerX + Math.cos(labelAngle) * labelRadius;
-      const labelY = centerY + Math.sin(labelAngle) * labelRadius;
+  const archetypes = archetypesData.archetypes;
+  const n = archetypes.length;
+  const W = 560, H = 420;
+  const cx = W / 2, cy = H / 2;
+  const outerR = 138, innerR = 82;
+  const gap = 0.04; // radians gap between segments
+  const labelR = 182;
 
-      ctx.fillStyle = '#000000';
-      ctx.font = '11px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(archetype.name, labelX, labelY);
-    }
+  const primaryId   = appState.primaryArchetype;
+  const secondaryId = appState.secondaryArchetype;
+
+  let segPaths = '';
+  let labelEls = '';
+
+  archetypes.forEach((arch, i) => {
+    const slice = (2 * Math.PI) / n;
+    const sa = i * slice - Math.PI / 2 + gap / 2;
+    const ea = (i + 1) * slice - Math.PI / 2 - gap / 2;
+    const mid = (sa + ea) / 2;
+
+    const isPrimary   = arch.id === primaryId;
+    const isSecondary = arch.id === secondaryId;
+
+    // Primary expands slightly outward
+    const oR = isPrimary ? outerR + 16 : (isSecondary ? outerR + 7 : outerR);
+    const iR = isPrimary ? innerR - 7  : innerR;
+
+    const x1 = cx + Math.cos(sa) * oR, y1 = cy + Math.sin(sa) * oR;
+    const x2 = cx + Math.cos(ea) * oR, y2 = cy + Math.sin(ea) * oR;
+    const x3 = cx + Math.cos(ea) * iR, y3 = cy + Math.sin(ea) * iR;
+    const x4 = cx + Math.cos(sa) * iR, y4 = cy + Math.sin(sa) * iR;
+    const d  = `M${x1},${y1} A${oR},${oR} 0 0,1 ${x2},${y2} L${x3},${y3} A${iR},${iR} 0 0,0 ${x4},${y4}Z`;
+
+    const fill = isPrimary ? '#FF4D00' : isSecondary ? '#FF8B47' : ARCH_COLORS[i];
+    const op   = isPrimary ? 1 : isSecondary ? 0.88 : 0.70;
+
+    segPaths += `<path
+      d="${d}" fill="${fill}" opacity="${op}"
+      stroke="#F7F6F3" stroke-width="2.5" stroke-linejoin="round"
+      class="arch-seg" data-id="${arch.id}" data-idx="${i}"
+      style="cursor:pointer;transform-box:fill-box;transform-origin:${cx}px ${cy}px;
+             transition:transform .22s cubic-bezier(.34,1.56,.64,1),opacity .18s,filter .18s"
+    />`;
+
+    // Label & leader line
+    const lx = cx + Math.cos(mid) * labelR;
+    const ly = cy + Math.sin(mid) * labelR;
+
+    // Leader line from edge of segment to label
+    const le_r = (isPrimary ? outerR + 18 : outerR + 8) + 4;
+    const lsx = cx + Math.cos(mid) * le_r;
+    const lsy = cy + Math.sin(mid) * le_r;
+    const lex = cx + Math.cos(mid) * (labelR - 16);
+    const ley = cy + Math.sin(mid) * (labelR - 16);
+
+    const cos_mid = Math.cos(mid);
+    const anchor = cos_mid > 0.2 ? 'start' : cos_mid < -0.2 ? 'end' : 'middle';
+    const lineCol  = isPrimary ? '#FF4D00' : isSecondary ? '#FF8B47' : 'rgba(10,10,10,0.18)';
+    const textCol  = isPrimary ? '#FF4D00' : isSecondary ? '#CC5500' : 'rgba(10,10,10,0.6)';
+    const fSize    = isPrimary ? 13.5 : isSecondary ? 12.5 : 11.5;
+    const fWeight  = isPrimary || isSecondary ? 700 : 400;
+
+    // Split "Decision-Maker" across two lines
+    const nameParts = arch.name === 'Decision-Maker'
+      ? ['Decision-', 'Maker']
+      : [arch.name];
+
+    const textLines = nameParts.length > 1
+      ? `<text x="${lx}" y="${ly - 6}" text-anchor="${anchor}" dominant-baseline="middle"
+             font-family="Inter,sans-serif" font-size="${fSize}" font-weight="${fWeight}"
+             fill="${textCol}" pointer-events="none">${nameParts[0]}</text>
+         <text x="${lx}" y="${ly + 8}" text-anchor="${anchor}" dominant-baseline="middle"
+             font-family="Inter,sans-serif" font-size="${fSize}" font-weight="${fWeight}"
+             fill="${textCol}" pointer-events="none">${nameParts[1]}</text>`
+      : `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle"
+             font-family="Inter,sans-serif" font-size="${fSize}" font-weight="${fWeight}"
+             fill="${textCol}" pointer-events="none">${arch.name}</text>`;
+
+    labelEls += `
+      <line x1="${lsx}" y1="${lsy}" x2="${lex}" y2="${ley}"
+            stroke="${lineCol}" stroke-width="${isPrimary ? 1.5 : 1}"
+            stroke-linecap="round" pointer-events="none"/>
+      ${textLines}`;
   });
 
-  // Set up click handlers for full wheel
-  setupDonutClickHandlers(centerX, centerY, radius, innerRadius);
-}
+  // Center text
+  const pArch = archetypesData.archetypes.find(a => a.id === primaryId);
+  const center = pArch ? `
+    <text x="${cx}" y="${cy - 14}" text-anchor="middle" dominant-baseline="middle"
+          font-family="Inter,sans-serif" font-size="9.5" font-weight="600"
+          fill="rgba(10,10,10,0.28)" letter-spacing="2.5" pointer-events="none">YOUR TYPE</text>
+    <text x="${cx}" y="${cy + 5}" text-anchor="middle" dominant-baseline="middle"
+          font-family="Inter,sans-serif" font-size="15.5" font-weight="800"
+          fill="#FF4D00" pointer-events="none">${pArch.name.toUpperCase()}</text>
+    <text x="${cx}" y="${cy + 22}" text-anchor="middle" dominant-baseline="middle"
+          font-family="Inter,sans-serif" font-size="9" fill="rgba(10,10,10,0.25)"
+          pointer-events="none">tap a segment to explore</text>` : '';
 
-function drawZoomedView(ctx, centerX, centerY, radius, innerRadius, progress) {
-  const zoomedArchetype = archetypesData.archetypes.find(a => a.id === donutState.currentZoom);
-  if (!zoomedArchetype) return;
+  container.innerHTML = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;overflow:visible">
+    ${segPaths}
+    ${labelEls}
+    ${center}
+  </svg>`;
 
-  // Draw subdomains
-  if (progress > 0.5) {
-    const subdomains = zoomedArchetype.subdomains;
-    const subSliceSize = (Math.PI * 2) / subdomains.length;
-    const outerRadius = radius * 0.85;
+  // Staggered entrance animation
+  container.querySelectorAll('.arch-seg').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'scale(0.75)';
+    setTimeout(() => {
+      const isPri = el.dataset.id === primaryId;
+      const isSec = el.dataset.id === secondaryId;
+      el.style.transition = `transform .42s cubic-bezier(.34,1.56,.64,1) ${i * 45}ms, opacity .35s ease ${i * 45}ms`;
+      el.style.transform = 'scale(1)';
+      el.style.opacity = isPri ? '1' : isSec ? '0.88' : '0.70';
+    }, 60);
 
-    subdomains.forEach((subdomain, index) => {
-      const startAngle = index * subSliceSize - Math.PI / 2;
-      const endAngle = startAngle + subSliceSize;
-      const colors = ['#FFB366', '#FF9933', '#FF8800'];
-
-      // Draw subdomain arc
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, outerRadius * (progress - 0.5) * 2, startAngle, endAngle);
-      ctx.arc(centerX, centerY, radius, endAngle, startAngle, true);
-      ctx.fillStyle = colors[index % colors.length];
-      ctx.fill();
-
-      // Label
-      const labelAngle = startAngle + subSliceSize / 2;
-      const labelRadius = (radius + outerRadius) / 2;
-      const labelX = centerX + Math.cos(labelAngle) * labelRadius;
-      const labelY = centerY + Math.sin(labelAngle) * labelRadius;
-
-      ctx.font = 'bold 16px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#0A0A0A';
-      ctx.fillText(subdomain, labelX, labelY);
+    el.addEventListener('mouseenter', () => {
+      el.style.transition = 'transform .18s cubic-bezier(.34,1.56,.64,1), opacity .15s, filter .15s';
+      el.style.transform = 'scale(1.07)';
+      el.style.opacity = '1';
+      el.style.filter = 'brightness(1.08)';
     });
-  }
-
-  // Draw archetype name
-  ctx.fillStyle = '#000000';
-  ctx.font = 'bold 16px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(zoomedArchetype.name, centerX, centerY);
+    el.addEventListener('mouseleave', () => {
+      const isPri = el.dataset.id === primaryId;
+      const isSec = el.dataset.id === secondaryId;
+      el.style.transition = 'transform .22s ease, opacity .18s, filter .15s';
+      el.style.transform = 'scale(1)';
+      el.style.opacity = isPri ? '1' : isSec ? '0.88' : '0.70';
+      el.style.filter = '';
+    });
+    el.addEventListener('click', () => {
+      const arch = archetypesData.archetypes.find(a => a.id === el.dataset.id);
+      if (arch) showArchetypeDetail(arch);
+    });
+  });
 }
 
-function setupDonutClickHandlers(centerX, centerY, radius, innerRadius) {
-  const canvas = donutState.canvas;
+function showArchetypeDetail(arch) {
+  const panel = document.getElementById('archetype-detail-panel');
+  if (!panel) return;
 
-  // Add tooltip element if it doesn't exist
-  let tooltip = document.getElementById('donut-tooltip');
-  if (!tooltip) {
-    tooltip = document.createElement('div');
-    tooltip.id = 'donut-tooltip';
-    tooltip.className = 'donut-tooltip';
-    tooltip.style.position = 'absolute';
-    tooltip.style.background = 'rgba(0, 0, 0, 0.85)';
-    tooltip.style.color = '#fff';
-    tooltip.style.padding = '8px 12px';
-    tooltip.style.borderRadius = '6px';
-    tooltip.style.fontSize = '13px';
-    tooltip.style.pointerEvents = 'none';
-    tooltip.style.opacity = '0';
-    tooltip.style.transition = 'opacity 0.2s ease';
-    tooltip.style.maxWidth = '200px';
-    tooltip.style.lineHeight = '1.4';
-    tooltip.style.zIndex = '1000';
-    document.body.appendChild(tooltip);
-  }
+  const isPrimary   = arch.id === appState.primaryArchetype;
+  const isSecondary = arch.id === appState.secondaryArchetype;
+  const badge = isPrimary
+    ? '<span class="arch-badge primary">Your Primary</span>'
+    : isSecondary
+      ? '<span class="arch-badge secondary">Your Secondary</span>'
+      : '';
 
-  canvas.onmousemove = (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  const strengths = (arch.strengths || []).slice(0, 3)
+    .map(s => `<li>${s}</li>`).join('');
 
-    const archetypes = archetypesData.archetypes;
-    const sliceSize = (Math.PI * 2) / archetypes.length;
+  panel.innerHTML = `
+    <div class="arch-detail-header">
+      <div>
+        <div class="arch-detail-name">${arch.name} ${badge}</div>
+        ${arch.tagline ? `<div class="arch-detail-role">${arch.tagline}</div>` : ''}
+      </div>
+      <button class="arch-detail-close" onclick="document.getElementById('archetype-detail-panel').style.display='none'">✕</button>
+    </div>
+    ${arch.executiveSummary ? `<p class="arch-detail-summary">${arch.executiveSummary}</p>` : ''}
+    ${strengths ? `<div class="arch-detail-label">Key Strengths</div><ul class="arch-detail-list">${strengths}</ul>` : ''}
+  `;
 
-    let foundArchetype = null;
-    for (let i = 0; i < archetypes.length; i++) {
-      const startAngle = i * sliceSize - Math.PI / 2;
-      const endAngle = startAngle + sliceSize;
-
-      if (isPointInSlice(x, y, centerX, centerY, innerRadius, radius, startAngle, endAngle)) {
-        foundArchetype = archetypes[i];
-        break;
-      }
-    }
-
-    if (foundArchetype) {
-      const description = foundArchetype.executiveSummary || foundArchetype.preference || '';
-      tooltip.innerHTML = `<strong>${foundArchetype.name}</strong><br>${description}`;
-      tooltip.style.left = (e.pageX + 15) + 'px';
-      tooltip.style.top = (e.pageY + 15) + 'px';
-      tooltip.style.opacity = '1';
-    } else {
-      tooltip.style.opacity = '0';
-    }
-  };
-
-  canvas.onmouseleave = () => {
-    tooltip.style.opacity = '0';
-  };
-
-  canvas.onclick = (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const archetypes = archetypesData.archetypes;
-    const sliceSize = (Math.PI * 2) / archetypes.length;
-
-    for (let i = 0; i < archetypes.length; i++) {
-      const startAngle = i * sliceSize - Math.PI / 2;
-      const endAngle = startAngle + sliceSize;
-
-      if (isPointInSlice(x, y, centerX, centerY, innerRadius, radius, startAngle, endAngle)) {
-        zoomIntoArchetype(archetypes[i].id);
-        return;
-      }
-    }
-  };
-}
-
-function isPointInSlice(x, y, centerX, centerY, innerR, outerR, startAngle, endAngle) {
-  const dx = x - centerX;
-  const dy = y - centerY;
-  const dist = Math.sqrt(dx * dx + dy * dy);
-
-  if (dist < innerR || dist > outerR) return false;
-
-  const angle = Math.atan2(dy, dx);
-  return isAngleBetween(angle, startAngle, endAngle);
-}
-
-function isAngleBetween(angle, startAngle, endAngle) {
-  const twoPi = Math.PI * 2;
-  const normalized = (value) => {
-    let result = value % twoPi;
-    if (result < 0) result += twoPi;
-    return result;
-  };
-
-  const a = normalized(angle);
-  const start = normalized(startAngle);
-  const end = normalized(endAngle);
-
-  if (start <= end) {
-    return a >= start && a <= end;
-  }
-  return a >= start || a <= end;
-}
-
-function zoomIntoArchetype(archetypeId) {
-  donutState.currentZoom = archetypeId;
-  donutState.animationProgress = 0;
-
-  document.getElementById('donut-instruction').classList.add('hidden');
-  document.getElementById('btn-back-to-wheel').style.display = 'block';
-
-  animateDonut();
+  panel.style.display = 'block';
+  panel.style.animation = 'pageFadeIn 0.28s cubic-bezier(0.16,1,0.3,1) both';
 }
 
 // ============================================
