@@ -4953,6 +4953,62 @@ strong {
 }
 .page-nav-btn.invisible { visibility: hidden; }
 
+/* ── Reflect cards (accordion) ── */
+.reflect-card {
+  border: 1.5px solid rgba(10,10,10,0.10);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.reflect-card:hover {
+  border-color: rgba(255,77,0,0.3);
+  box-shadow: 0 4px 20px rgba(10,10,10,0.06);
+}
+.reflect-card.open {
+  border-color: #FF4D00;
+  box-shadow: 0 4px 24px rgba(255,77,0,0.10);
+}
+.reflect-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1.5rem;
+  gap: 1rem;
+}
+.reflect-card-q {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0A0A0A;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+.reflect-card-icon {
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: #FF4D00;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+.reflect-card.open .reflect-card-icon {
+  transform: rotate(45deg);
+}
+.reflect-card-body {
+  display: none;
+  padding: 0 1.5rem 1.4rem;
+}
+.reflect-card.open .reflect-card-body {
+  display: block;
+  animation: pageFadeIn 0.25s cubic-bezier(0.16,1,0.3,1) both;
+}
+.reflect-card-body p {
+  font-size: 0.93rem;
+  color: rgba(10,10,10,0.72);
+  line-height: 1.75;
+}
+
 /* ════════════════════════════════════════════════
    EXPERIENCE 2 CSS (scoped to body.exp2-active)
 ════════════════════════════════════════════════ */
@@ -8193,12 +8249,7 @@ body.exp2-active #view-exp2 { padding-top: 0; }
 
 
 
-              <!-- CTA to Team Archetype -->
-              <div class="team-cta">
-                <h3>Team Archetype</h3>
-                <p>See how your team's leadership pattern stacks up.</p>
-                <button class="btn-to-team" data-page="team">Explore Team Pattern</button>
-              </div>
+              <!-- removed standalone team CTA — now flows via page nav -->
 
             </div>
           </section>
@@ -8206,7 +8257,65 @@ body.exp2-active #view-exp2 { padding-top: 0; }
           <!-- Bottom nav -->
           <div class="page-nav">
             <button class="page-nav-btn" onclick="showPage('home')">← Back</button>
-            <button class="page-nav-btn next" onclick="if(window.appState){window.appState.part1Complete=true;} showPage('three-systems')">Part 2: Three Systems →</button>
+            <button class="page-nav-btn next" onclick="if(window.appState){window.appState.part1Complete=true;} showPage('reflect')">What does this mean? →</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- REFLECT PAGE — What does this mean for you? -->
+      <div class="page" id="page-reflect">
+        <div class="module-content">
+
+          <section class="intro-section">
+            <h2 class="section-heading" style="font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-0.025em;margin-bottom:0.5rem;">What does this mean for you?</h2>
+            <p class="intro-text">Your archetype describes your default mode — the style you fall back on under pressure. The real leverage comes when you understand how that archetype interacts with others in your team.</p>
+          </section>
+
+          <section style="margin-top:2.5rem;display:flex;flex-direction:column;gap:1.25rem;">
+
+            <!-- Q1 -->
+            <div class="reflect-card" onclick="this.classList.toggle('open')">
+              <div class="reflect-card-header">
+                <div class="reflect-card-q">What if your team has all Archetypes covered?</div>
+                <div class="reflect-card-icon">+</div>
+              </div>
+              <div class="reflect-card-body">
+                <p>A full spread of archetypes is a genuine strength — every critical leadership function has a natural owner. Navigators hold direction, Connectors hold relationships, Guardians hold stability. The risk is friction without shared language: people mistake difference for deficiency.</p>
+                <p style="margin-top:0.75rem;"><strong>The opportunity:</strong> make the diversity visible. When people understand why a colleague leads differently, what feels like conflict often becomes complementarity.</p>
+              </div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="reflect-card" onclick="this.classList.toggle('open')">
+              <div class="reflect-card-header">
+                <div class="reflect-card-q">What if your team has too many of the same Archetypes?</div>
+                <div class="reflect-card-icon">+</div>
+              </div>
+              <div class="reflect-card-body">
+                <p>Concentration creates blind spots. A team of Navigators will excel at strategy and miss the human signals. A team of Energisers will generate momentum but struggle to consolidate it. The pattern tends to repeat — in meetings, in decisions, in the problems that never quite get solved.</p>
+                <p style="margin-top:0.75rem;"><strong>The opportunity:</strong> name the gap. Knowing what's missing is the first step to compensating for it — either by developing range in existing members, or by being deliberate about who you bring in next.</p>
+              </div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="reflect-card" onclick="this.classList.toggle('open')">
+              <div class="reflect-card-header">
+                <div class="reflect-card-q">What if your team is missing an Archetype?</div>
+                <div class="reflect-card-icon">+</div>
+              </div>
+              <div class="reflect-card-body">
+                <p>A missing archetype doesn't mean the function disappears — it means it goes unowned. If no one is anchoring, the team drifts. If no one is synchronising, coordination becomes invisible overhead. Teams rarely name the gap; they just feel the drag.</p>
+                <p style="margin-top:0.75rem;"><strong>The opportunity:</strong> gap awareness is leadership intelligence. Once you can name what's missing, you can make a conscious choice: who develops that capacity, who you bring in, or what process you put in place to cover it.</p>
+              </div>
+            </div>
+
+          </section>
+
+          <!-- Bottom nav -->
+          <div class="page-nav">
+            <button class="page-nav-btn" onclick="showPage('module1')">← Back</button>
+            <button class="page-nav-btn next" onclick="showPage('team')">Identify Team Archetypes →</button>
           </div>
 
         </div>
@@ -8499,8 +8608,8 @@ body.exp2-active #view-exp2 { padding-top: 0; }
 
           <!-- Bottom nav -->
           <div class="page-nav">
-            <button class="page-nav-btn" onclick="showPage('module1')">← Back</button>
-            <button class="page-nav-btn next" onclick="showPage('team')">Team Archetype →</button>
+            <button class="page-nav-btn" onclick="showPage('team')">← Back</button>
+            <button class="page-nav-btn next" onclick="showView('hub')">Return to Programme →</button>
           </div>
         </div>
       </div>
@@ -8510,6 +8619,10 @@ body.exp2-active #view-exp2 { padding-top: 0; }
         <div class="module-content locked-content">
           <h2>Module 2: Interpersonal Mastery</h2>
           <p>Coming soon. Unlock after completing Module 1.</p>
+          <div class="page-nav">
+            <button class="page-nav-btn" onclick="showPage('home')">← Back</button>
+            <button class="page-nav-btn next invisible" aria-hidden="true">·</button>
+          </div>
         </div>
       </div>
 
@@ -8518,6 +8631,10 @@ body.exp2-active #view-exp2 { padding-top: 0; }
         <div class="module-content locked-content">
           <h2>Module 3: Difficult Conversations</h2>
           <p>Coming soon. Unlock after completing Module 1.</p>
+          <div class="page-nav">
+            <button class="page-nav-btn" onclick="showPage('home')">← Back</button>
+            <button class="page-nav-btn next invisible" aria-hidden="true">·</button>
+          </div>
         </div>
       </div>
 
@@ -8526,6 +8643,10 @@ body.exp2-active #view-exp2 { padding-top: 0; }
         <div class="module-content locked-content">
           <h2>Module 4: Culture</h2>
           <p>Coming soon. Unlock after completing Module 1.</p>
+          <div class="page-nav">
+            <button class="page-nav-btn" onclick="showPage('home')">← Back</button>
+            <button class="page-nav-btn next invisible" aria-hidden="true">·</button>
+          </div>
         </div>
       </div>
 
@@ -8534,6 +8655,10 @@ body.exp2-active #view-exp2 { padding-top: 0; }
         <div class="module-content locked-content">
           <h2>Module 5: Visioning</h2>
           <p>Coming soon. Unlock after completing Module 1.</p>
+          <div class="page-nav">
+            <button class="page-nav-btn" onclick="showPage('home')">← Back</button>
+            <button class="page-nav-btn next invisible" aria-hidden="true">·</button>
+          </div>
         </div>
       </div>
 
@@ -8542,18 +8667,22 @@ body.exp2-active #view-exp2 { padding-top: 0; }
         <div class="module-content locked-content">
           <h2>Leadership Network</h2>
           <p>Available after Vision is complete.</p>
+          <div class="page-nav">
+            <button class="page-nav-btn" onclick="showPage('home')">← Back</button>
+            <button class="page-nav-btn next invisible" aria-hidden="true">·</button>
+          </div>
         </div>
       </div>
 
       <!-- TEAM ARCHETYPE PAGE -->
       <div class="page" id="page-team">
         <div class="module-content">
-          
+
           <!-- Intro -->
           <section class="team-intro-section">
+            <h2 class="section-heading" style="font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-0.025em;margin-bottom:0.5rem;">Can you identify your Team Archetypes?</h2>
             <p class="intro-text">
-              You can't coach what you can't see.
-              Enter a team count to reveal the pattern.
+              You can't coach what you can't see. Enter how many people in your team lead with each archetype — your best estimate is enough. Then generate your team's leadership profile.
             </p>
           </section>
 
@@ -8595,8 +8724,8 @@ body.exp2-active #view-exp2 { padding-top: 0; }
 
           <!-- Bottom nav -->
           <div class="page-nav">
-            <button class="page-nav-btn" onclick="showPage('three-systems')">← Back</button>
-            <button class="page-nav-btn next" onclick="showView('hub')">Return to Programme →</button>
+            <button class="page-nav-btn" onclick="showPage('reflect')">← Back</button>
+            <button class="page-nav-btn next" onclick="showPage('three-systems')">Part 2: Three Systems →</button>
           </div>
         </div>
       </div>
@@ -9874,7 +10003,7 @@ function setupAssessmentSection() {
   const teamCtaBtn = document.querySelector('.btn-to-team');
   if (teamCtaBtn) {
     teamCtaBtn.addEventListener('click', () => {
-      showPage('team');
+      showPage('reflect'); // now flows through reflect → team
     });
   }
 }
