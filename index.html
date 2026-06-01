@@ -4506,6 +4506,28 @@ strong {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* Inline SVG diagram for the three systems */
+.systems-diagram {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #faf9f6;
+  border: 1px solid rgba(10,10,10,0.07);
+}
+.systems-diagram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+@keyframes sys-pulse {
+  0%,100% { opacity: 0.82; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.04); }
+}
+@keyframes sys-pulse-slow {
+  0%,100% { opacity: 0.75; }
+  50%      { opacity: 0.95; }
+}
+
 .intro-explanation p {
   margin-bottom: 1.5rem;
   line-height: 1.7;
@@ -8388,7 +8410,7 @@ body.exp2-active #view-exp2 { padding-top: 0; }
             <!-- Intro Block -->
             <section class="systems-intro">
               <div class="intro-image-container">
-                <img src="assets/Leadership_1.png" alt="The three systems: Drive, Threat, and Soothing working together" class="systems-intro-image" />
+                <div class="systems-diagram" data-drive="68" data-threat="68" data-soothing="68" data-pulse="none" data-label="Balanced · all three systems in proportion"></div>
               </div>
               <div class="intro-explanation">
                 <p><strong>Three systems regulate how we respond to challenges:</strong></p>
@@ -8407,7 +8429,7 @@ body.exp2-active #view-exp2 { padding-top: 0; }
               <!-- Question 1 -->
               <div class="mcq-card" id="mcq-1">
                 <div class="mcq-image-container">
-                  <img src="assets/Leadership_2.png" alt="Drive and Threat high, Soothing low: out of balance" class="mcq-image" />
+                  <div class="systems-diagram" data-drive="84" data-threat="82" data-soothing="36" data-pulse="both" data-label="Drive high · Threat high · Soothing depleted"></div>
                 </div>
                 <div class="mcq-content">
                   <h3 class="mcq-prompt">Which leadership example best matches this pattern (high Drive + high Threat, limited Soothing)?</h3>
@@ -8443,7 +8465,7 @@ body.exp2-active #view-exp2 { padding-top: 0; }
               <!-- Question 2 -->
               <div class="mcq-card" id="mcq-2" style="display: none;">
                 <div class="mcq-image-container">
-                  <img src="assets/Leadership_3.png" alt="Threat system dominating: out of control" class="mcq-image" />
+                  <div class="systems-diagram" data-drive="52" data-threat="108" data-soothing="28" data-pulse="threat" data-label="Threat dominating · Drive and Soothing suppressed"></div>
                 </div>
                 <div class="mcq-content">
                   <h3 class="mcq-prompt">Which leadership example best matches this pattern (Threat system dominating)?</h3>
@@ -8479,7 +8501,7 @@ body.exp2-active #view-exp2 { padding-top: 0; }
               <!-- Question 3 -->
               <div class="mcq-card" id="mcq-3" style="display: none;">
                 <div class="mcq-image-container">
-                  <img src="assets/Leadership_4.png" alt="Soothing system strengthened: regulated and balanced" class="mcq-image" />
+                  <div class="systems-diagram" data-drive="62" data-threat="50" data-soothing="92" data-pulse="soothing" data-label="Soothing strengthened · regulated and grounded"></div>
                 </div>
                 <div class="mcq-content">
                   <h3 class="mcq-prompt">Which leadership example best matches this pattern (Soothing system strengthened)?</h3>
@@ -11002,8 +11024,77 @@ const mcqData = {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
+  initSystemsDiagrams();
   setupThreeSystems();
 });
+
+// ============================================
+// THREE SYSTEMS — SVG DIAGRAM RENDERER
+// ============================================
+function initSystemsDiagrams() {
+  document.querySelectorAll('.systems-diagram').forEach(el => {
+    const dR = parseInt(el.dataset.drive   || 68);
+    const tR = parseInt(el.dataset.threat  || 68);
+    const sR = parseInt(el.dataset.soothing|| 68);
+    const pulse  = el.dataset.pulse  || 'none';
+    const label  = el.dataset.label  || '';
+
+    const W = 380, H = 240;
+    // Fixed triangle positions
+    const dx = 108, dy = 93;   // Drive
+    const tx = 272, ty = 93;   // Threat
+    const sx = 190, sy = 183;  // Soothing
+
+    // Colors
+    const DC = '#FF5C35', TC = '#C94040', SC = '#35B09A';
+
+    // Pulse animation styles
+    const dAnim = (pulse === 'both') ? `animation:sys-pulse 2.2s ease-in-out infinite;transform-origin:${dx}px ${dy}px;transform-box:fill-box` : '';
+    const tAnim = (pulse === 'threat' || pulse === 'both') ? `animation:sys-pulse 2.2s ease-in-out infinite 0.4s;transform-origin:${tx}px ${ty}px;transform-box:fill-box` : '';
+    const sAnim = (pulse === 'soothing') ? `animation:sys-pulse 2.8s ease-in-out infinite;transform-origin:${sx}px ${sy}px;transform-box:fill-box` : '';
+
+    const labelTag = label ? `
+      <text x="${W/2}" y="${H - 10}" text-anchor="middle" font-family="Inter,sans-serif"
+            font-size="10" fill="rgba(10,10,10,0.35)" font-weight="500" letter-spacing="0.04em">${label}</text>` : '';
+
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+      <defs>
+        <radialGradient id="gd-${dx}" cx="40%" cy="35%"><stop offset="0%" stop-color="${DC}" stop-opacity="0.35"/><stop offset="100%" stop-color="${DC}" stop-opacity="0.18"/></radialGradient>
+        <radialGradient id="gt-${tx}" cx="60%" cy="35%"><stop offset="0%" stop-color="${TC}" stop-opacity="0.35"/><stop offset="100%" stop-color="${TC}" stop-opacity="0.18"/></radialGradient>
+        <radialGradient id="gs-${sx}" cx="50%" cy="40%"><stop offset="0%" stop-color="${SC}" stop-opacity="0.35"/><stop offset="100%" stop-color="${SC}" stop-opacity="0.18"/></radialGradient>
+      </defs>
+
+      <!-- Drive circle -->
+      <circle cx="${dx}" cy="${dy}" r="${dR}" fill="url(#gd-${dx})" stroke="${DC}" stroke-width="2" style="${dAnim}"/>
+      <text x="${dx}" y="${dy - 6}" text-anchor="middle" dominant-baseline="middle"
+            font-family="Inter,sans-serif" font-size="${Math.max(9, Math.min(13, dR/5.5))}"
+            font-weight="800" fill="${DC}" letter-spacing="0.08em" style="${dAnim}">DRIVE</text>
+      <text x="${dx}" y="${dy + 10}" text-anchor="middle" dominant-baseline="middle"
+            font-family="Inter,sans-serif" font-size="${Math.max(8, Math.min(10, dR/7))}"
+            fill="${DC}" opacity="0.7" style="${dAnim}">Achievement</text>
+
+      <!-- Threat circle -->
+      <circle cx="${tx}" cy="${ty}" r="${tR}" fill="url(#gt-${tx})" stroke="${TC}" stroke-width="2" style="${tAnim}"/>
+      <text x="${tx}" y="${ty - 6}" text-anchor="middle" dominant-baseline="middle"
+            font-family="Inter,sans-serif" font-size="${Math.max(9, Math.min(13, tR/5.5))}"
+            font-weight="800" fill="${TC}" letter-spacing="0.08em" style="${tAnim}">THREAT</text>
+      <text x="${tx}" y="${ty + 10}" text-anchor="middle" dominant-baseline="middle"
+            font-family="Inter,sans-serif" font-size="${Math.max(8, Math.min(10, tR/7))}"
+            fill="${TC}" opacity="0.7" style="${tAnim}">Protection</text>
+
+      <!-- Soothing circle -->
+      <circle cx="${sx}" cy="${sy}" r="${sR}" fill="url(#gs-${sx})" stroke="${SC}" stroke-width="2" style="${sAnim}"/>
+      <text x="${sx}" y="${sy - 6}" text-anchor="middle" dominant-baseline="middle"
+            font-family="Inter,sans-serif" font-size="${Math.max(9, Math.min(13, sR/5.5))}"
+            font-weight="800" fill="${SC}" letter-spacing="0.08em" style="${sAnim}">SOOTHING</text>
+      <text x="${sx}" y="${sy + 10}" text-anchor="middle" dominant-baseline="middle"
+            font-family="Inter,sans-serif" font-size="${Math.max(8, Math.min(10, sR/7))}"
+            fill="${SC}" opacity="0.7" style="${sAnim}">Recovery</text>
+
+      ${labelTag}
+    </svg>`;
+  });
+}
 
 function setupThreeSystems() {
   // Set up Part 1 completion button
