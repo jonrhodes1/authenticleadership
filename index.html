@@ -16154,19 +16154,17 @@ const leadershipValues = [
 ];
 
 /* ============================================================
-   ROUND THEMES (10)
+   ROUND THEMES (8)
    ============================================================ */
 const roundThemes = [
-  { id: "leadership", title: "Leadership (Practice)", icon: "◈", prompt: "Imagine 10 years from now. Leaders across the University feel connected, confident in complexity, and able to make clear decisions under pressure." },
+  { id: "research", title: "Research Impact (Practice)", icon: "◆", prompt: "Imagine 10 years from now. Research leads to meaningful change beyond academia." },
   { id: "sustainability", title: "Sustainability", icon: "◉", prompt: "Imagine 10 years from now. Sustainability is built into everyday decisions across teaching, research, operations, and partnerships." },
   { id: "teaching", title: "Teaching and Learning", icon: "◎", prompt: "Imagine 10 years from now. Learning feels applied, inclusive, and future-focused across every stage." },
   { id: "student", title: "Student Experience", icon: "◍", prompt: "Imagine 10 years from now. Students feel known, supported, challenged, and proud to belong." },
   { id: "partnerships", title: "Partnerships", icon: "◌", prompt: "Imagine 10 years from now. Partnerships create clear value and visible impact." },
-  { id: "research", title: "Research Impact", icon: "◆", prompt: "Imagine 10 years from now. Research leads to meaningful change beyond academia." },
   { id: "culture", title: "Culture and Wellbeing", icon: "◇", prompt: "Imagine 10 years from now. Ambition is matched by care, clarity, and recovery." },
   { id: "innovation", title: "Innovation", icon: "◈", prompt: "Imagine 10 years from now. Ideas move quickly into practice." },
-  { id: "community", title: "Community Engagement", icon: "◉", prompt: "Imagine 10 years from now. The University is deeply connected to its region." },
-  { id: "future", title: "Future University", icon: "◎", prompt: "Imagine 10 years from now. The University adapts without losing its values." }
+  { id: "community", title: "Community Engagement", icon: "◉", prompt: "Imagine 10 years from now. The University is deeply connected to its region." }
 ];
 
 /* ============================================================
@@ -17692,84 +17690,28 @@ function closeEndGameConfirm() {
 /* ============================================================
    SCREEN 7: END GAME
    ============================================================ */
-let endGameSelectedIdx = null; // index in rounds array, or 'new' for custom
-
 function renderEndGame() {
-  const roundCardsHtml = visioningState.rounds.map((r, i) => {
-    const isSelected = endGameSelectedIdx === i;
-    const tagCatalyst = r.catalystCard ? `<span class="round-select-tag tag-catalyst">⚡ ${escHtml(r.catalystCard.title)}</span>` : '';
-    const tagChallenger = r.challengerCard ? `<span class="round-select-tag tag-challenger">⚠ ${escHtml(r.challengerCard.title)}</span>` : '';
-    return `
-      <div class="round-select-card ${isSelected ? 'selected' : ''}" onclick="selectEndGameRound(${i})">
-        <div class="round-select-theme">${escHtml(r.themeTitle)}</div>
-        <div class="round-select-meta">Visionary: ${escHtml(r.visionary)}</div>
-        <div style="margin-top:6px;">${tagCatalyst}${tagChallenger}</div>
-        <div style="margin-top:6px;">${r.edgeValues.map(t => `<span class="round-select-tag" style="background:var(--accent-dim);color:var(--accent);">${escHtml(t)}</span>`).join('')}</div>
-      </div>`;
-  }).join('');
-
-  const newCardSelected = endGameSelectedIdx === 'new';
-  const newCardHtml = `
-    <div class="round-select-card ${newCardSelected ? 'selected' : ''}" onclick="selectEndGameRound('new')">
-      <div class="round-select-theme">Create a new idea</div>
-      <span class="round-select-tag tag-new">+ Custom</span>
-    </div>`;
-
-  const newGoalInput = newCardSelected ? `
-    <div class="card" style="max-width:580px;margin-bottom:24px;">
-      <div class="form-group">
-        <label class="form-label">What goal do you want to vision?</label>
-        <input class="form-input" id="custom-goal-input" type="text"
-               placeholder="Build a stronger leadership culture across the University"
-               value="${escHtml(visioningState.realVision.goal)}"
-               maxlength="200"
-               oninput="visioningState.realVision.goal=this.value">
-      </div>
-    </div>` : '';
-
-  const canContinue = endGameSelectedIdx !== null && (endGameSelectedIdx !== 'new' || visioningState.realVision.goal.trim().length > 0);
-
   return `
   <div>
     <h1 class="screen-title">Step 4: The End Game</h1>
-    <p class="screen-subtitle">Choose one idea to take forward. Shape it into a real vision with momentum, obstacles, targets, and commitment.</p>
+    <p class="screen-subtitle">The practice rounds are over. Now it's personal: drop the roles and the catalyst cards, and play as yourself. Together, build a real vision for Leadership.</p>
 
-    <div class="round-select-grid">
-      ${roundCardsHtml}
-      ${newCardHtml}
+    <div class="card" style="max-width:640px;margin-bottom:24px;">
+      <div class="round-select-theme" style="font-size:1.25rem;margin-bottom:8px;">Leadership</div>
+      <p style="font-size:0.9375rem;color:var(--t2);line-height:1.6;">Imagine 10 years from now. Leaders across the University feel connected, confident in complexity, and able to make clear decisions under pressure. This is the vision you'll shape together.</p>
     </div>
 
-    ${newGoalInput}
-
-    <button class="btn btn-primary btn-lg" onclick="startRealVision()" ${canContinue ? '' : 'disabled'}>
+    <button class="btn btn-primary btn-lg" onclick="startRealVision()">
       Build the Real Vision →
     </button>
-    ${!canContinue ? `<p style="margin-top:12px;font-size:0.875rem;color:var(--t3);">Select an idea to continue</p>` : ''}
   </div>`;
 }
 
 function initEndGame() {}
 
-function selectEndGameRound(idx) {
-  endGameSelectedIdx = idx;
-  if (idx !== 'new') {
-    const round = visioningState.rounds[idx];
-    visioningState.selectedEndGameIdea = round;
-    visioningState.realVision.goal = round.themeTitle;
-  } else {
-    visioningState.selectedEndGameIdea = null;
-  }
-  document.getElementById('app-content').innerHTML = renderEndGame();
-  initEndGame();
-}
-
 function startRealVision() {
-  if (endGameSelectedIdx === 'new' && !visioningState.realVision.goal.trim()) return;
-  if (endGameSelectedIdx !== 'new') {
-    visioningState.selectedEndGameIdea = visioningState.rounds[endGameSelectedIdx];
-  } else {
-    visioningState.selectedEndGameIdea = { custom: true, goal: visioningState.realVision.goal };
-  }
+  visioningState.realVision.goal = 'Leadership';
+  visioningState.selectedEndGameIdea = { custom: true, goal: 'Leadership' };
   navigate('realVision');
 }
 
@@ -17778,8 +17720,6 @@ function startRealVision() {
    ============================================================ */
 function renderRealVision() {
   const rv = visioningState.realVision;
-  const idea = visioningState.selectedEndGameIdea;
-  const ideaTitle = idea ? (idea.custom ? rv.goal : idea.themeTitle) : '';
 
   const archetypeHtml = archetypes.map(a => {
     const sel = rv.archetypes.includes(a);
@@ -17789,8 +17729,8 @@ function renderRealVision() {
   return `
   <div>
     <h1 class="screen-title">Build the Real Vision</h1>
-    <p class="screen-subtitle" style="margin-bottom:8px;">Vision: <strong style="color:var(--accent);">${escHtml(ideaTitle)}</strong></p>
-    <p style="font-size:0.875rem;color:var(--t2);margin-bottom:40px;">This section uses written inputs. Take time to be specific.</p>
+    <p class="screen-subtitle" style="margin-bottom:8px;">Vision: <strong style="color:var(--accent);">Leadership</strong></p>
+    <p style="font-size:0.875rem;color:var(--t2);margin-bottom:40px;">You're playing as yourself now, no roles, no cards. This section uses written inputs. Take time to be specific.</p>
 
     <div class="vision-panels">
       <!-- PITCH -->
@@ -18434,8 +18374,7 @@ function updateMission(field, value) {
 function renderFinalOutput() {
   const s = visioningState;
   const rv = s.realVision;
-  const idea = s.selectedEndGameIdea;
-  const visionGoal = idea ? (idea.custom ? rv.goal : idea.themeTitle) : rv.goal;
+  const visionGoal = rv.goal || 'Leadership';
 
   // Section 1: Values Signature
   const top10Html = s.top10Values.map((t, i) => {
@@ -18617,8 +18556,7 @@ function initFinalOutput() {
 function buildPrintOutput() {
   const s = visioningState;
   const rv = s.realVision;
-  const idea = s.selectedEndGameIdea;
-  const visionGoal = idea ? (idea.custom ? rv.goal : idea.themeTitle) : rv.goal;
+  const visionGoal = rv.goal || 'Leadership';
 
   const top10Print = s.top10Values.map((t, i) => {
     const v = getDisplayValue(t);
