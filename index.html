@@ -13854,6 +13854,7 @@ const App = () => {
 
   useEffect(() => {
     const handler = (e) => {
+      if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
       if (showAbout) {
         if (e.key === 'Escape') setShowAbout(false);
         return;
@@ -16822,12 +16823,13 @@ function renderValuesSort() {
       </div>
     </div>` : ''}
 
-    <div style="margin-top:28px;">
+    <div style="margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
       <button class="btn btn-primary btn-lg" onclick="navigate('selectTop10')" ${allSorted ? '' : 'disabled'}>
         Continue to Ranking
       </button>
-      ${!allSorted ? `<p style="margin-top:10px;font-size:0.875rem;color:var(--t3);">${total - stdSortedCount} standard value${(total - stdSortedCount) !== 1 ? 's' : ''} left to sort</p>` : ''}
     </div>
+    ${!allSorted ? `<p style="margin-top:10px;font-size:0.875rem;color:var(--t3);">${total - stdSortedCount} standard value${(total - stdSortedCount) !== 1 ? 's' : ''} left to sort</p>` : ''}
   </div>`;
 }
 
@@ -16937,9 +16939,12 @@ function renderSelectTop10() {
 
     <div class="selectable-values-grid" style="margin-bottom:32px;">${cardsHtml}</div>
 
-    <button class="btn btn-primary btn-lg" onclick="navigate('rankTop10')" ${complete ? '' : 'disabled'}>
-      Continue to Ranking →
-    </button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="navigate('rankTop10')" ${complete ? '' : 'disabled'}>
+        Continue to Ranking →
+      </button>
+    </div>
     ${!complete ? `<p style="margin-top:12px;font-size:0.875rem;color:var(--t3);">Select ${remaining} more value${remaining !== 1 ? 's' : ''}</p>` : ''}
   </div>`;
 }
@@ -16985,7 +16990,8 @@ function renderRankTop10() {
 
     <div class="rank-list" id="rank-list">${items}</div>
 
-    <div style="margin-top:32px;">
+    <div style="margin-top:32px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
       <button class="btn btn-primary btn-lg" onclick="navigate('lockIn')">
         Lock Values
       </button>
@@ -17100,9 +17106,12 @@ function renderLockIn() {
       </div>
     </div>
 
-    <button class="btn btn-primary btn-lg" onclick="navigate('edgeValues')">
-      Continue to Edge Values →
-    </button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="navigate('edgeValues')">
+        Continue to Edge Values →
+      </button>
+    </div>
   </div>`;
 }
 
@@ -17162,9 +17171,12 @@ function renderEdgeValues() {
 
     ${featureHtml}
 
-    <button class="btn btn-primary btn-lg" onclick="navigate('gameIntro')" ${complete ? '' : 'disabled'}>
-      Continue to Visioning Game →
-    </button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="navigate('gameIntro')" ${complete ? '' : 'disabled'}>
+        Continue to Visioning Game →
+      </button>
+    </div>
     ${!complete ? `<p style="margin-top:12px;font-size:0.875rem;color:var(--t3);">Select 2 Edge Values to continue</p>` : ''}
   </div>`;
 }
@@ -17222,9 +17234,12 @@ function renderGameIntro() {
 
     <p style="font-size:0.9375rem;color:var(--t2);margin-bottom:32px;">During rounds, you speak. The screen guides. There are no text inputs in the game itself.</p>
 
-    <button class="btn btn-primary btn-lg" onclick="navigate('playerSetup')">
-      Set Up Players →
-    </button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="navigate('playerSetup')">
+        Set Up Players →
+      </button>
+    </div>
   </div>`;
 }
 
@@ -17260,9 +17275,12 @@ function renderPlayerSetup() {
 
     <p style="font-size:0.8125rem;color:var(--t3);margin-bottom:24px;">${players.length} / 10 players${players.length < 4 ? ` (need at least ${4 - players.length} more)` : ''}</p>
 
-    <button class="btn btn-primary btn-lg" onclick="assignRoles()" ${valid ? '' : 'disabled'}>
-      Assign Roles →
-    </button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="assignRoles()" ${valid ? '' : 'disabled'}>
+        Assign Roles →
+      </button>
+    </div>
   </div>`;
 }
 
@@ -17333,9 +17351,12 @@ function renderRoleAssignment() {
 
     <div class="role-cards-grid">${cardsHtml}</div>
 
-    <button class="btn btn-primary btn-lg" onclick="navigate('themeSelection')">
-      Select Round Theme →
-    </button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="navigate('themeSelection')">
+        Select Round Theme →
+      </button>
+    </div>
   </div>`;
 }
 
@@ -17365,10 +17386,10 @@ function renderThemeSelection() {
     ${renderEdgeBadges()}
     <div class="theme-grid">${cardsHtml}</div>
 
-    ${visioningState.rounds.length > 0 ? `
-      <div style="margin-top:16px;">
-        <button class="btn btn-secondary" onclick="navigate('endGame')">Go to End Game →</button>
-      </div>` : ''}
+    <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+      ${visioningState.rounds.length > 0 ? `<button class="btn btn-secondary" onclick="navigate('endGame')">Go to End Game →</button>` : ''}
+    </div>
   </div>`;
 }
 
@@ -17455,9 +17476,12 @@ function renderRoundRoles() {
 
     <div class="role-cards-grid">${cardsHtml}</div>
 
-    <button class="btn btn-primary btn-lg" onclick="navigate('roundPitch')">
-      Begin Pitch, ${escHtml(visionary)} starts →
-    </button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="navigate('roundPitch')">
+        Begin Pitch, ${escHtml(visionary)} starts →
+      </button>
+    </div>
   </div>`;
 }
 
@@ -17488,9 +17512,12 @@ function renderRoundPitch() {
       The Visionary sets the direction. Speak freely. The screen will move you forward when ready.
     </div>
 
-    <button class="btn btn-primary btn-lg" onclick="navigate('roundGrow')">
-      Move to Grow →
-    </button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="navigate('roundGrow')">
+        Move to Grow →
+      </button>
+    </div>
 
     <button class="btn btn-ghost btn-sm end-game-go-btn" onclick="showEndGameConfirm()">
       Go to End Game
@@ -17550,9 +17577,12 @@ function renderRoundGrow() {
       </div>
     </div>
 
-    <button class="btn btn-primary btn-lg" onclick="navigate('roundImagine')">
-      Move to Imagine →
-    </button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="navigate('roundImagine')">
+        Move to Imagine →
+      </button>
+    </div>
 
     <button class="btn btn-ghost btn-sm end-game-go-btn" onclick="showEndGameConfirm()">
       Go to End Game
@@ -17596,9 +17626,12 @@ function renderRoundImagine() {
       <p>Now, discuss how the vision was for each person. What was different? What was it like to achieve this vision? What would be one suitable step to get us closer to our vision?</p>
     </div>
 
-    <button class="btn btn-success btn-lg" onclick="completeRound()">
-      Complete Round ✓
-    </button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+      <button class="btn btn-success btn-lg" onclick="completeRound()">
+        Complete Round ✓
+      </button>
+    </div>
 
     <button class="btn btn-ghost btn-sm end-game-go-btn" onclick="showEndGameConfirm()">
       Go to End Game
@@ -17656,6 +17689,7 @@ function renderRoundComplete() {
       <strong style="color:var(--t1);">${escHtml(lastRound.themeTitle)}</strong>, completed by ${escHtml(lastRound.visionary)}
     </p>
     <div class="round-complete-actions">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
       <button class="btn btn-secondary btn-lg" onclick="navigate('themeSelection')">Play Another Round</button>
       <button class="btn btn-primary btn-lg" onclick="navigate('endGame')">Go to End Game →</button>
     </div>
@@ -17701,9 +17735,12 @@ function renderEndGame() {
       <p style="font-size:0.9375rem;color:var(--t2);line-height:1.6;">Imagine 10 years from now. Leaders across the University feel connected, confident in complexity, and able to make clear decisions under pressure. This is the vision you'll shape together.</p>
     </div>
 
-    <button class="btn btn-primary btn-lg" onclick="startRealVision()">
-      Build the Real Vision →
-    </button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="startRealVision()">
+        Build the Real Vision →
+      </button>
+    </div>
   </div>`;
 }
 
@@ -17867,7 +17904,8 @@ function renderRealVision() {
       </div>
     </div>
 
-    <div style="margin-top:32px;">
+    <div style="margin-top:32px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
       <button class="btn btn-primary btn-lg" onclick="navigate('timeline')">
         Continue to Timeline →
       </button>
@@ -17980,12 +18018,13 @@ function renderTimeline() {
       </div>
     </div>` : ''}
 
-    <div style="margin-top:16px;">
+    <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
       <button class="btn btn-primary btn-lg" onclick="lockTimeline()" ${canLock ? '' : 'disabled'}>
         Lock Timeline →
       </button>
-      ${!canLock ? `<p style="margin-top:12px;font-size:0.875rem;color:var(--t3);">Add at least 2 targets, 2 obstacles, and 2 actions to continue</p>` : ''}
     </div>
+    ${!canLock ? `<p style="margin-top:12px;font-size:0.875rem;color:var(--t3);">Add at least 2 targets, 2 obstacles, and 2 actions to continue</p>` : ''}
 
     ${modalHtml}
   </div>`;
@@ -18193,7 +18232,10 @@ function renderCommitment() {
 
       <div class="commitment-forms">
         ${completionHtml || formsHtml}
-        ${!allDone ? `<div style="margin-top:8px;"><button class="btn btn-ghost btn-sm" onclick="navigate('backOfBook')">Skip to Mission Statement</button></div>` : ''}
+        <div style="margin-top:8px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+          <button class="btn btn-ghost btn-sm" onclick="goBack()">← Back</button>
+          ${!allDone ? `<button class="btn btn-ghost btn-sm" onclick="navigate('backOfBook')">Skip to Mission Statement</button>` : ''}
+        </div>
       </div>
     </div>
   </div>`;
@@ -18346,9 +18388,12 @@ function renderBackOfBook() {
       </div>
     </div>
 
-    <button class="btn btn-primary btn-lg" onclick="navigate('finalOutput')" ${valid ? '' : 'disabled'}>
-      Complete the Experience →
-    </button>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-ghost" onclick="goBack()">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="navigate('finalOutput')" ${valid ? '' : 'disabled'}>
+        Complete the Experience →
+      </button>
+    </div>
     ${!valid ? `<p style="margin-top:12px;font-size:0.875rem;color:var(--t3);">Fill in all three parts to continue</p>` : ''}
   </div>`;
 }
@@ -18534,6 +18579,7 @@ function renderFinalOutput() {
 
       <!-- EXPORT -->
       <div class="output-export-row">
+        <button class="btn btn-ghost" onclick="goBack()">← Back</button>
         <button class="btn btn-primary btn-lg" onclick="exportToPrint()">
           ↓ Download Vision Blueprint PDF
         </button>
