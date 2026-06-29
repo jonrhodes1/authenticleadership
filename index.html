@@ -2111,6 +2111,107 @@ body {
   color: #fff;
 }
 
+/* BACK COVER BOOK MOCKUP */
+.book-spread {
+  display: flex;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+  min-height: 340px;
+  margin: 28px 0 36px;
+}
+.book-back-cover {
+  flex: 1.15;
+  background: #f4f0e6;
+  padding: 34px 30px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.book-back-cover::before {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(10,9,8,0.18);
+  pointer-events: none;
+}
+.book-back-headline {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.4rem;
+  color: var(--t1);
+  margin-bottom: 18px;
+}
+.book-back-text {
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: var(--t2);
+  white-space: pre-wrap;
+  flex: 1;
+}
+.book-back-text p { margin-bottom: 12px; }
+.book-back-placeholder { color: rgba(10,9,8,0.35); }
+.book-spine {
+  width: 42px;
+  background: var(--t1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.book-spine span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: 'Instrument Serif', serif;
+  color: #fff;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.book-front-cover {
+  flex: 1.4;
+  background: linear-gradient(165deg, #1a1917, var(--t1) 80%);
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  color: #fff;
+  overflow: hidden;
+}
+.book-front-art {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 58%;
+}
+.book-front-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2rem;
+  line-height: 1.15;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 2;
+}
+.book-front-rule {
+  width: 44px;
+  height: 2px;
+  background: var(--accent);
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 2;
+}
+.book-front-sub {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.78);
+  position: relative;
+  z-index: 2;
+}
+@media (max-width: 720px) {
+  .book-spread { flex-direction: column; }
+  .book-spine { width: 100%; height: 32px; }
+  .book-spine span { writing-mode: horizontal-tb; transform: none; }
+}
+
 /* MISSION STATEMENT OUTPUT */
 .output-mission-section {
   background: var(--t1);
@@ -7676,6 +7777,107 @@ html { font-size: 16px; scroll-behavior: smooth; }
   font-weight: 600;
   line-height: 1.65;
   color: #fff;
+}
+
+/* BACK COVER BOOK MOCKUP */
+.book-spread {
+  display: flex;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.18);
+  min-height: 340px;
+  margin: 28px 0 36px;
+}
+.book-back-cover {
+  flex: 1.15;
+  background: #f4f0e6;
+  padding: 34px 30px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.book-back-cover::before {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(10,9,8,0.18);
+  pointer-events: none;
+}
+.book-back-headline {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.4rem;
+  color: var(--t1);
+  margin-bottom: 18px;
+}
+.book-back-text {
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: var(--t2);
+  white-space: pre-wrap;
+  flex: 1;
+}
+.book-back-text p { margin-bottom: 12px; }
+.book-back-placeholder { color: rgba(10,9,8,0.35); }
+.book-spine {
+  width: 42px;
+  background: var(--t1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.book-spine span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: 'Instrument Serif', serif;
+  color: #fff;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.book-front-cover {
+  flex: 1.4;
+  background: linear-gradient(165deg, #1a1917, var(--t1) 80%);
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  color: #fff;
+  overflow: hidden;
+}
+.book-front-art {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 58%;
+}
+.book-front-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2rem;
+  line-height: 1.15;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 2;
+}
+.book-front-rule {
+  width: 44px;
+  height: 2px;
+  background: var(--accent);
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 2;
+}
+.book-front-sub {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.78);
+  position: relative;
+  z-index: 2;
+}
+@media (max-width: 720px) {
+  .book-spread { flex-direction: column; }
+  .book-spine { width: 100%; height: 32px; }
+  .book-spine span { writing-mode: horizontal-tb; transform: none; }
 }
 
 /* MISSION STATEMENT OUTPUT */
@@ -16274,7 +16476,7 @@ const visioningState = {
     whatsNext: ''
   },
   commitments: [], // { player, action, when, support, done }
-  missionStatement: { anchor: '', goal: '', agency: '' }
+  backCover: { hook: '', steps: '', whyItMatters: '' }
 };
 
 /* ============================================================
@@ -18280,135 +18482,112 @@ function editCommitment(idx) {
 /* ============================================================
    SCREEN 11: BACK OF THE BOOK
    ============================================================ */
-function getMissionPreview() {
-  const ms = visioningState.missionStatement;
-  const anchor = ms.anchor.trim();
-  const goal   = ms.goal.trim();
-  const agency = ms.agency.trim();
-  if (!anchor && !goal && !agency) return '';
-  let parts = [];
-  if (anchor) parts.push(`Guided by ${anchor}`);
-  if (goal)   parts.push(`we will ${goal}`);
-  if (agency) parts.push(`by ${agency}`);
-  return parts.join(', ') + '.';
+function getBackCoverPreviewHtml() {
+  const bc = visioningState.backCover;
+  const hook = bc.hook.trim();
+  const steps = bc.steps.trim();
+  const why = bc.whyItMatters.trim();
+  if (!hook && !steps && !why) {
+    return '<span class="book-back-placeholder">Your back cover will appear here as you write…</span>';
+  }
+  let html = '';
+  if (hook) html += `<p>${escHtml(hook)}</p>`;
+  if (steps) html += `<p>${escHtml(steps)}</p>`;
+  if (why) html += `<p>${escHtml(why)}</p>`;
+  return html;
+}
+
+function getBackCoverPlainText() {
+  const bc = visioningState.backCover;
+  return [bc.hook.trim(), bc.steps.trim(), bc.whyItMatters.trim()].filter(Boolean).join('\n\n');
 }
 
 function renderBackOfBook() {
-  const ms = visioningState.missionStatement;
-  const edge = visioningState.edgeValues;
-  const edgeHint = edge.length ? edge.map(getDisplayTitle).join(' and ') : 'your edge values';
-  const preview = getMissionPreview();
-  const valid = ms.anchor.trim().length >= 5 && ms.goal.trim().length >= 10 && ms.agency.trim().length >= 10;
+  const bc = visioningState.backCover;
+  const valid = bc.hook.trim().length >= 10 && bc.steps.trim().length >= 10 && bc.whyItMatters.trim().length >= 10;
 
   return `
-  <div style="max-width:820px;">
-    <h1 class="screen-title">Write your Mission Statement</h1>
-    <p class="screen-subtitle">A mission statement is how you pitch your vision to the people who need to act on it. Three parts. One clear sentence the whole group can stand behind.</p>
+  <div style="max-width:900px;">
+    <h1 class="screen-title">We did it, and this is how:</h1>
+    <p class="screen-subtitle">Imagine this vision has already happened. Write the back cover of the book your team would publish about it.</p>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:32px;align-items:start;">
-
-      <!-- LEFT: THREE INPUTS -->
-      <div style="display:flex;flex-direction:column;gap:20px;">
-
-        <div class="form-group">
-          <label class="form-label">
-            <span class="mission-part-badge" style="background:var(--accent-dim);color:var(--accent);">1</span>
-            Values anchor
-          </label>
-          <p style="font-size:0.8125rem;color:var(--t3);margin-bottom:8px;">Start with what you stand for. Use your edge values: <strong style="color:var(--t2);">${escHtml(edgeHint)}</strong>.</p>
-          <div class="mission-prefix-row">
-            <span class="mission-prefix">Guided by</span>
-            <input class="form-input" id="ms-anchor" type="text"
-                   placeholder="a commitment to clarity and courage"
-                   value="${escHtml(ms.anchor)}"
-                   oninput="updateMission('anchor',this.value)">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">
-            <span class="mission-part-badge" style="background:var(--success-dim);color:var(--success);">2</span>
-            The goal
-          </label>
-          <p style="font-size:0.8125rem;color:var(--t3);margin-bottom:8px;">Name the future you are building. Be specific. Name the change you want to see.</p>
-          <div class="mission-prefix-row">
-            <span class="mission-prefix">we will</span>
-            <input class="form-input" id="ms-goal" type="text"
-                   placeholder="build a culture where every leader can act on their values"
-                   value="${escHtml(ms.goal)}"
-                   oninput="updateMission('goal',this.value)">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">
-            <span class="mission-part-badge" style="background:var(--purple-dim);color:var(--purple);">3</span>
-            Agency
-          </label>
-          <p style="font-size:0.8125rem;color:var(--t3);margin-bottom:8px;">Describe how. Who is involved, what they will do, and what behaviour creates the future.</p>
-          <div class="mission-prefix-row">
-            <span class="mission-prefix">by</span>
-            <input class="form-input" id="ms-agency" type="text"
-                   placeholder="creating shared practice, honest conversation, and protected time to reflect"
-                   value="${escHtml(ms.agency)}"
-                   oninput="updateMission('agency',this.value)">
-          </div>
-        </div>
-
+    <div class="book-spread">
+      <div class="book-back-cover">
+        <div class="book-back-headline">We did it, and this is how:</div>
+        <div class="book-back-text" id="backcover-preview-text">${getBackCoverPreviewHtml()}</div>
       </div>
-
-      <!-- RIGHT: GUIDE + PREVIEW -->
-      <div style="display:flex;flex-direction:column;gap:16px;">
-
-        <div class="card subtle" style="padding:20px;">
-          <div style="font-size:0.6875rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--t3);margin-bottom:14px;">What makes it work</div>
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            <div>
-              <div style="font-size:0.8125rem;font-weight:700;color:var(--accent);margin-bottom:3px;">Values anchor</div>
-              <div style="font-size:0.8125rem;color:var(--t2);line-height:1.55;">Ground the statement in what the group actually believes. Use the language of your edge values, not abstract ideals.</div>
-            </div>
-            <div>
-              <div style="font-size:0.8125rem;font-weight:700;color:var(--success);margin-bottom:3px;">Goal</div>
-              <div style="font-size:0.8125rem;color:var(--t2);line-height:1.55;">State the concrete future. Avoid vague aspirations. If you can measure or observe it, write that.</div>
-            </div>
-            <div>
-              <div style="font-size:0.8125rem;font-weight:700;color:var(--purple);margin-bottom:3px;">Agency</div>
-              <div style="font-size:0.8125rem;color:var(--t2);line-height:1.55;">Name the behaviour, not the intention. "By creating..." beats "by trying to..." every time.</div>
-            </div>
-          </div>
+      <div class="book-spine"><span>The Leadership We Built</span></div>
+      <div class="book-front-cover">
+        <div class="book-front-art">
+          <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMax slice" style="width:100%;height:100%;display:block;">
+            <circle cx="200" cy="190" r="78" fill="none" stroke="rgba(255,77,0,0.3)" stroke-width="1"/>
+            <circle cx="200" cy="190" r="54" fill="none" stroke="rgba(255,77,0,0.45)" stroke-width="1"/>
+            <circle cx="200" cy="190" r="30" fill="rgba(255,77,0,0.9)"/>
+            <line x1="0" y1="190" x2="400" y2="190" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+          </svg>
         </div>
-
-        <div class="mission-preview-card" id="mission-preview">
-          <div style="font-size:0.6875rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--t3);margin-bottom:10px;">Live preview</div>
-          <p class="mission-preview-text" id="mission-preview-text">
-            ${preview ? escHtml(preview) : '<span style="color:var(--t4);">Your mission statement will appear here as you type...</span>'}
-          </p>
-        </div>
-
+        <div class="book-front-title">The Leadership<br>We Built</div>
+        <div class="book-front-rule"></div>
+        <div class="book-front-sub">How we turned our values into a vision worth following</div>
       </div>
     </div>
 
-    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+    <div class="card" style="padding:28px;max-width:720px;">
+      <h2 style="font-size:1.0625rem;font-weight:800;color:var(--t1);margin-bottom:4px;">Write the Back Cover</h2>
+      <p style="font-size:0.875rem;color:var(--t2);margin-bottom:20px;">Three prompts. Answer them like the blurb on the back of a book your team would be proud to publish.</p>
+
+      <div class="form-group">
+        <label class="form-label">
+          <span class="mission-part-badge" style="background:var(--accent-dim);color:var(--accent);">1</span>
+          Hook the reader
+        </label>
+        <p style="font-size:0.8125rem;color:var(--t3);margin-bottom:8px;">Open with the line that makes someone want to read on. What was true before, and what changed?</p>
+        <textarea class="form-textarea" rows="3" maxlength="400" id="bc-hook"
+                  placeholder="Once, the room went quiet when it mattered most…"
+                  oninput="updateBackCover('hook',this.value)">${escHtml(bc.hook)}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <span class="mission-part-badge" style="background:var(--success-dim);color:var(--success);">2</span>
+          What were the steps?
+        </label>
+        <p style="font-size:0.8125rem;color:var(--t3);margin-bottom:8px;">Tell the journey. What did the team actually do to get from there to here?</p>
+        <textarea class="form-textarea" rows="3" maxlength="400" id="bc-steps"
+                  placeholder="It started with naming our values, then…"
+                  oninput="updateBackCover('steps',this.value)">${escHtml(bc.steps)}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <span class="mission-part-badge" style="background:var(--purple-dim);color:var(--purple);">3</span>
+          Why it matters
+        </label>
+        <p style="font-size:0.8125rem;color:var(--t3);margin-bottom:8px;">Name the stakes. Why was this worth doing, and who is better off because of it?</p>
+        <textarea class="form-textarea" rows="3" maxlength="400" id="bc-why"
+                  placeholder="Because the people who follow us deserve leaders who…"
+                  oninput="updateBackCover('whyItMatters',this.value)">${escHtml(bc.whyItMatters)}</textarea>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:24px;">
       <button class="btn btn-ghost" onclick="goBack()">← Back</button>
       <button class="btn btn-primary btn-lg" onclick="navigate('finalOutput')" ${valid ? '' : 'disabled'}>
         Complete the Experience →
       </button>
     </div>
-    ${!valid ? `<p style="margin-top:12px;font-size:0.875rem;color:var(--t3);">Fill in all three parts to continue</p>` : ''}
+    ${!valid ? `<p style="margin-top:12px;font-size:0.875rem;color:var(--t3);">Fill in all three prompts to continue</p>` : ''}
   </div>`;
 }
 
 function initBackOfBook() {}
 
-function updateMission(field, value) {
-  visioningState.missionStatement[field] = value;
-  const preview = getMissionPreview();
-  const previewEl = document.getElementById('mission-preview-text');
-  if (previewEl) {
-    previewEl.innerHTML = preview ? escHtml(preview) : '<span style="color:var(--t4);">Your mission statement will appear here as you type...</span>';
-  }
-  const ms = visioningState.missionStatement;
-  const valid = ms.anchor.trim().length >= 5 && ms.goal.trim().length >= 10 && ms.agency.trim().length >= 10;
+function updateBackCover(field, value) {
+  visioningState.backCover[field] = value;
+  const previewEl = document.getElementById('backcover-preview-text');
+  if (previewEl) previewEl.innerHTML = getBackCoverPreviewHtml();
+  const bc = visioningState.backCover;
+  const valid = bc.hook.trim().length >= 10 && bc.steps.trim().length >= 10 && bc.whyItMatters.trim().length >= 10;
   const btn = document.querySelector('.btn.btn-primary.btn-lg');
   if (btn) btn.disabled = !valid;
 }
@@ -18557,24 +18736,23 @@ function renderFinalOutput() {
         ${commitmentsHtml}
       </div>` : ''}
 
-      <!-- MISSION STATEMENT -->
-      ${getMissionPreview() ? `
+      <!-- BACK COVER -->
+      ${getBackCoverPlainText() ? `
       <div class="output-section output-mission-section">
         <div class="output-section-header">
           <div class="output-section-num">7</div>
-          <div class="output-section-title">Mission Statement</div>
+          <div class="output-section-title">We did it, and this is how:</div>
         </div>
-        <blockquote class="output-mission-statement">${escHtml(getMissionPreview())}</blockquote>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px;">
-          ${s.missionStatement.anchor ? `<div class="output-mission-part"><div class="output-mission-part-label" style="color:var(--accent);">Values anchor</div><div class="output-mission-part-text">Guided by ${escHtml(s.missionStatement.anchor)}</div></div>` : ''}
-          ${s.missionStatement.goal ? `<div class="output-mission-part"><div class="output-mission-part-label" style="color:var(--success);">Goal</div><div class="output-mission-part-text">we will ${escHtml(s.missionStatement.goal)}</div></div>` : ''}
-          ${s.missionStatement.agency ? `<div class="output-mission-part"><div class="output-mission-part-label" style="color:var(--purple);">Agency</div><div class="output-mission-part-text">by ${escHtml(s.missionStatement.agency)}</div></div>` : ''}
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:4px;">
+          ${s.backCover.hook ? `<div class="output-mission-part"><div class="output-mission-part-label" style="color:var(--accent);">Hook</div><div class="output-mission-part-text">${escHtml(s.backCover.hook)}</div></div>` : ''}
+          ${s.backCover.steps ? `<div class="output-mission-part"><div class="output-mission-part-label" style="color:var(--success);">The steps</div><div class="output-mission-part-text">${escHtml(s.backCover.steps)}</div></div>` : ''}
+          ${s.backCover.whyItMatters ? `<div class="output-mission-part"><div class="output-mission-part-label" style="color:var(--purple);">Why it matters</div><div class="output-mission-part-text">${escHtml(s.backCover.whyItMatters)}</div></div>` : ''}
         </div>
       </div>` : ''}
 
       <!-- CLOSING -->
       <div class="output-closing">
-        A mission statement only works when it changes what people do on Monday morning. Share it. Test it. Return to it when the pressure rises.
+        The back cover only works when it changes what people do on Monday morning. Share it. Test it. Return to it when the pressure rises.
       </div>
 
       <!-- EXPORT -->
@@ -18740,17 +18918,16 @@ function buildPrintOutput() {
 
       ${commitmentsPrint ? `<div class="print-section-title">Commitments</div>${commitmentsPrint}` : ''}
 
-      ${getMissionPreview() ? `
-        <div class="print-section-title">Mission Statement</div>
-        <div class="print-mission-statement">${escHtml(getMissionPreview())}</div>
+      ${getBackCoverPlainText() ? `
+        <div class="print-section-title">We did it, and this is how:</div>
         <div class="print-mission-parts">
-          ${s.missionStatement.anchor ? `<div class="print-mission-part"><span class="print-mission-label" style="color:#ff5500;">Values anchor</span> Guided by ${escHtml(s.missionStatement.anchor)}</div>` : ''}
-          ${s.missionStatement.goal ? `<div class="print-mission-part"><span class="print-mission-label" style="color:#0a8a52;">Goal</span> we will ${escHtml(s.missionStatement.goal)}</div>` : ''}
-          ${s.missionStatement.agency ? `<div class="print-mission-part"><span class="print-mission-label" style="color:#6b3fc8;">Agency</span> by ${escHtml(s.missionStatement.agency)}</div>` : ''}
+          ${s.backCover.hook ? `<div class="print-mission-part"><span class="print-mission-label" style="color:#ff5500;">Hook</span> ${escHtml(s.backCover.hook)}</div>` : ''}
+          ${s.backCover.steps ? `<div class="print-mission-part"><span class="print-mission-label" style="color:#0a8a52;">The steps</span> ${escHtml(s.backCover.steps)}</div>` : ''}
+          ${s.backCover.whyItMatters ? `<div class="print-mission-part"><span class="print-mission-label" style="color:#6b3fc8;">Why it matters</span> ${escHtml(s.backCover.whyItMatters)}</div>` : ''}
         </div>` : ''}
 
       <div class="print-closing">
-        A mission statement only works when it changes what people do on Monday morning. Share it. Test it. Return to it when the pressure rises.
+        The back cover only works when it changes what people do on Monday morning. Share it. Test it. Return to it when the pressure rises.
       </div>
 
       <div class="print-footer">
