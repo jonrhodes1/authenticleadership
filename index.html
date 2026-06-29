@@ -18460,7 +18460,7 @@ function renderCommitment() {
         ${completionHtml || formsHtml}
         <div style="margin-top:8px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
           <button class="btn btn-ghost btn-sm" onclick="goBack()">← Back</button>
-          ${!allDone ? `<button class="btn btn-ghost btn-sm" onclick="navigate('backOfBook')">Skip to Mission Statement</button>` : ''}
+          ${!allDone ? `<button class="btn btn-ghost btn-sm" onclick="navigate('backOfBook')">Skip to Back Cover</button>` : ''}
         </div>
       </div>
     </div>
@@ -18584,7 +18584,7 @@ function renderBackOfBook() {
 
     <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:24px;">
       <button class="btn btn-ghost" onclick="goBack()">← Back</button>
-      <button class="btn btn-primary btn-lg" onclick="navigate('finalOutput')" ${valid ? '' : 'disabled'}>
+      <button class="btn btn-primary btn-lg" id="bc-complete-btn" onclick="navigate('finalOutput')" ${valid ? '' : 'disabled'}>
         Complete the Experience →
       </button>
     </div>
@@ -18600,7 +18600,7 @@ function updateBackCover(field, value) {
   if (previewEl) previewEl.innerHTML = getBackCoverPreviewHtml();
   const bc = visioningState.backCover;
   const valid = bc.hook.trim().length >= 10 && bc.steps.trim().length >= 10 && bc.whyItMatters.trim().length >= 10;
-  const btn = document.querySelector('.btn.btn-primary.btn-lg');
+  const btn = document.getElementById('bc-complete-btn');
   if (btn) btn.disabled = !valid;
 }
 
@@ -18764,7 +18764,7 @@ function renderFinalOutput() {
 
       <!-- CLOSING -->
       <div class="output-closing">
-        The back cover only works when it changes what people do on Monday morning. Share it. Test it. Return to it when the pressure rises.
+        The back cover is abstract until the first steps are followed. Return to it when steps are completed or when recalibration needs to occur. And of course, you can write several back covers with different goals as needed.
       </div>
 
       <!-- EXPORT -->
@@ -18939,7 +18939,7 @@ function buildPrintOutput() {
         </div>` : ''}
 
       <div class="print-closing">
-        The back cover only works when it changes what people do on Monday morning. Share it. Test it. Return to it when the pressure rises.
+        The back cover is abstract until the first steps are followed. Return to it when steps are completed or when recalibration needs to occur. And of course, you can write several back covers with different goals as needed.
       </div>
 
       <div class="print-footer">
