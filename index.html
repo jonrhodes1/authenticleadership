@@ -18374,7 +18374,7 @@ function renderCommitment() {
 
   const dialColour = pct === 100 ? 'var(--success)' : 'var(--accent)';
 
-  const allActionsHtml = [...visioningState.timeline.targets, ...visioningState.timeline.obstacles, ...visioningState.timeline.actions]
+  const allActionsHtml = visioningState.timeline.actions
     .map(item => `<option value="${escHtml(item.label)}">${escHtml(item.label)} (${escHtml(item.timeLabel || item.time)})</option>`)
     .join('');
 
